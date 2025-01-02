@@ -3,10 +3,12 @@ namespace Domain.Base.Entities
 {
     public class Purchase : BaseEntitie
     {
-        public required User User { get; set; }
+        public long UserId { get; set; }
+        public User? User { get; set; }
         public required string Name { get; set; }
-        public string Description { get; set; } = string.Empty;
+        public string? Description { get; set; }
         public decimal TotalPrice { get; set; }
-        public Categorie? Categorie { get; set; } 
+        public long? CategorieId { get; set; } 
+        public PurchaseCategorie? Categorie { get; set; } 
     }
 }

@@ -1,9 +1,11 @@
-﻿using Domain.Base.Interfaces;
+﻿using Data.Context;
+using Domain.Base.Interfaces;
 using Domain.Cards.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Data.Repositories.Cards
 {
-    public class CardRepositorie(IBaseRepositorie<Card> baseRepositorie)
+    public class CardRepositorie(IBaseRepositorie<Card> baseRepositorie, EntityFramework entityFramework)
     {
         public async Task DeleteAsync(Card baseEntitie)
         {
@@ -18,6 +20,14 @@ namespace Data.Repositories.Cards
         public async Task UpdateAsync(Card baseEntitie)
         {
             await baseRepositorie.Update(baseEntitie);
+        }
+
+        public async Task<Card?> GetCardAsync(long userId,long id)
+        {
+            Card? card = await entityFramework.Card.Include(x=> x.User).Include(x=> x.Categorie).FirstAsync(x=> x.UserId == userId && 
+            x.Id == id);
+
+            return card;
         }
     }
 }

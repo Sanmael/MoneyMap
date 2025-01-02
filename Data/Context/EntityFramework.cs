@@ -1,4 +1,5 @@
-﻿using Domain.Cards.Entities;
+﻿using Domain.Base.Entities;
+using Domain.Cards.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Data.Context
@@ -10,6 +11,10 @@ namespace Data.Context
             
         }
 
-        public DbSet<Card> Cards { get; set; }
+        public DbSet<Card> Card { get; set; }
+        public DbSet<User> User { get; set; }
+        public DbSet<PurchaseCategorie> Categorie { get; set; }
+        public DbSet<PurchaseInInstallments> PurchaseInInstallments { get; set; }
+
     }
 }
