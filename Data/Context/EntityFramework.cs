@@ -15,6 +15,7 @@ namespace Data.Context
         public DbSet<User> User { get; set; }
         public DbSet<PurchaseCategorie> Categorie { get; set; }
         public DbSet<PurchaseInInstallments> PurchaseInInstallments { get; set; }
+        public DbSet<Installments> Installments { get; set; }
 
     }
 }

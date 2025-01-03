@@ -39,10 +39,10 @@ namespace Business.Extensions
         {
             return new PurchaseInInstallments
             {
+                DateOfPurchase = purchaseInInstallments.DateOfPurchase,
+                TotalPrice = purchaseInInstallments.GetTotalValue(),
                 UserId = purchaseInInstallments.UserId,
-                CardId = purchaseInInstallments.CardId,
-                NumberOfInstallments = purchaseInInstallments.NumberOfInstallments,
-                InstallmentValue = purchaseInInstallments.InstallmentValue,
+                CardId = purchaseInInstallments.CardId,                
                 Name = purchaseInInstallments.Name,
                 Description = purchaseInInstallments.Description,
                 CategorieId = purchaseInInstallments.CategorieId
@@ -51,16 +51,35 @@ namespace Business.Extensions
 
         public static PurchaseInInstallmentsModel MapperEntitieToModel(this PurchaseInInstallments entitie)
         {
-            return new PurchaseInInstallmentsModel
+            PurchaseInInstallmentsModel purchaseInInstallmentsModel = new PurchaseInInstallmentsModel
             {
+                Paid = entitie.Paid,
                 CardId = entitie.CardId,
-                NumberOfInstallments = entitie.NumberOfInstallments,
-                InstallmentValue = entitie.InstallmentValue,
                 Name = entitie.Name,
                 Description = entitie.Description,
                 TotalPrice = entitie.TotalPrice,
                 CategorieId = entitie.CategorieId
             };
+
+            if(entitie.Installments != null && entitie.Installments.Any())
+            {
+                purchaseInInstallmentsModel.InstallmentsModels = new List<InstallmentsModel>();
+
+                foreach (var installment in entitie.Installments)
+                {
+                    purchaseInInstallmentsModel.InstallmentsModels.Add(new InstallmentsModel()
+                    {
+                        Id = installment.Id,
+                        Value = installment.Value,
+                        PurchaseInInstallmentsId = installment.PurchaseInInstallmentsId,
+                        InstallmentNumber = installment.InstallmentNumber,
+                        ReferringMonth = installment.ReferringMonth,
+                        Paid = installment.Paid
+                    });
+                }
+            }
+
+            return purchaseInInstallmentsModel;
         }
     }
 }

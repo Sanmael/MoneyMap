@@ -1,18 +1,16 @@
 ﻿using Business.Extensions;
 using Business.Models;
 using Business.Requests.Card;
-using Domain.Base.Entities;
 using Domain.Cards.Entities;
-using Mapster;
 
 namespace Business.Mappers
 {
     public static class CardMapper
     {
-        public static Card MapInsertRequestToEntitie(InsertCardRequest card)
+        public static Card? MapInsertRequestToEntitie(InsertCardRequest card)
         {
             if (card == null)
-                throw new ArgumentNullException(nameof(card));
+                return null;
 
             return new Card()
             {
@@ -22,7 +20,7 @@ namespace Business.Mappers
                 Description = card.Description,
                 Limit = card.Limit,
                 Balance = card.Balance,
-                CategorieId = card.CategorieId 
+                CategorieId = card.CategorieId
             };
         }
 

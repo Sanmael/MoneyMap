@@ -23,11 +23,18 @@ namespace Data.Repositories.Cards
             await baseRepositorie.Update(baseEntitie);
         }
 
-        public async Task<PurchaseInInstallments?> GetPurchaseInInstallmentsAsync(long cardId)
-        {            
-            PurchaseInInstallments? purchaseInInstallments = await entityFramework.PurchaseInInstallments.FirstOrDefaultAsync(x=> x.CardId == cardId);
-            
+        public async Task<PurchaseInInstallments?> GetPurchaseInInstallmentsAsync(long purchaseInInstallmentsId)
+        {
+            PurchaseInInstallments? purchaseInInstallments = await entityFramework.PurchaseInInstallments.Include(x => x.Installments).FirstAsync(x=> x.Id == purchaseInInstallmentsId);
+
             return purchaseInInstallments;
+        }
+
+        public async Task<List<PurchaseInInstallments>>? GetPurchaseInInstallmentsActiveAsync(long cardId)
+        {
+            List<PurchaseInInstallments>? query = await entityFramework.PurchaseInInstallments.Include(x => x.Installments).Where(x=> x.CardId == cardId && !x.Paid).ToListAsync();
+
+            return query;
         }
     }
 }

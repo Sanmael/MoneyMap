@@ -1,6 +1,6 @@
 ﻿using Business.Interfaces;
-using Business.Models;
 using Business.Requests.Card;
+using Business.Response;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CardsAPI.Controllers
@@ -15,9 +15,12 @@ namespace CardsAPI.Controllers
             if (!ModelState.IsValid)
                 return RedirectToAction("", card);
 
-            CardModel cardModel = await cardService.AddCardAsync(card);
+            BaseResponse response = await cardService.AddCardAsync(card);
 
-            return Ok(cardModel);
+            if(!response.Success)
+                return BadRequest(response);
+
+            return Ok(response);
         }
 
         [HttpGet]
@@ -26,9 +29,12 @@ namespace CardsAPI.Controllers
             if (!ModelState.IsValid)
                 return RedirectToAction("", card);
 
-            CardModel cardModel = await cardService.GetCardAsync(card);
+            BaseResponse response = await cardService.GetCardAsync(card);
 
-            return Ok(cardModel);
+            if (!response.Success)
+                return BadRequest(response);
+
+            return Ok(response);
         }
     }
 }
