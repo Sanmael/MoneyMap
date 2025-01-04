@@ -1,5 +1,4 @@
-﻿using Business.Models;
-using Business.Requests.Card;
+﻿using Business.Requests.Card;
 using Business.Response;
 
 namespace Business.Interfaces

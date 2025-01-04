@@ -1,11 +1,10 @@
-﻿using Business.Interfaces;
-using Business.Mappers;
+﻿using Business.Extensions;
+using Business.Interfaces;
 using Business.Models;
 using Business.Requests.Card;
 using Business.Response;
 using Data.Repositories.Cards;
 using Domain.Cards.Entities;
-using Mapster;
 
 namespace Business.Services
 {
@@ -13,7 +12,7 @@ namespace Business.Services
     {
         public async Task<BaseResponse> AddCardAsync(InsertCardRequest card)
         {
-            Card? cardEntitie = CardMapper.MapInsertRequestToEntitie(card);
+            Card? cardEntitie = card.MapInsertRequestToEntitie();
 
             if (cardEntitie == null)
                 return new BaseResponse(new List<string>() { "Cartão nao encontrado" });
@@ -23,7 +22,7 @@ namespace Business.Services
 
             await cardRepositorie.InsertAsync(cardEntitie);
 
-            return new BaseResponse<CardModel>(cardEntitie.Adapt<CardModel>());
+            return new BaseResponse<CardModel>(cardEntitie.MapperEntitieToModel());
         }
 
         public async Task<BaseResponse> GetCardAsync(GetCardRequest card)
@@ -33,7 +32,7 @@ namespace Business.Services
             if (cardEntitie == null)
                 return new BaseResponse(new List<string>() { "cartão não encontrado!" });
 
-            return new BaseResponse<CardModel>(CardMapper.MapperEntitieToModel(cardEntitie));
+            return new BaseResponse<CardModel>(cardEntitie.MapperEntitieToModel());
         }
 
         public async Task<BaseResponse> UpdateBalanceCardAsync(UpdateBalanceCardRequest updateCard)
@@ -50,7 +49,7 @@ namespace Business.Services
             
             await cardRepositorie.UpdateAsync(card);
 
-            return new BaseResponse<CardModel>(CardMapper.MapperEntitieToModel(card));
+            return new BaseResponse<CardModel>(card.MapperEntitieToModel());
         }
     }
 }

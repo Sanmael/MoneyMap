@@ -6,11 +6,11 @@ using Business.Requests.Card.PurchaseInInstallments;
 using Business.Response;
 using Data.Repositories.Cards;
 using Domain.Cards.Entities;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Business.Services
 {
-    public class PurchaseInInstallmentsService(ICardService cardService, PurchaseInInstallmentsRepositorie purchaseInInstallmentsRepositorie, InstallmentsRepositorie installmentsRepositorie) : IPurchaseInInstallmentsService
+    public class PurchaseInInstallmentsService(ICardService cardService, PurchaseInInstallmentsRepositorie purchaseInInstallmentsRepositorie,
+        InstallmentsRepositorie installmentsRepositorie) : IPurchaseInInstallmentsService
     {
         public async Task<BaseResponse> AddPurchaseInInstallmentsAsync(InsertPurchaseInInstallmentsRequest purchaseInInstallmentsRequest)
         {
@@ -25,7 +25,7 @@ namespace Business.Services
 
             PurchaseInInstallments purchaseInInstallments = purchaseInInstallmentsRequest.MapperInsertRequestToEntitie();
 
-            CardModel card = response.ReturnResult<CardModel>();
+            CardModel card = response.GetEntitie<CardModel>();
 
             decimal newBalance = card.Balance - purchaseInInstallments.TotalPrice;
 
@@ -38,9 +38,7 @@ namespace Business.Services
                 decimal totalCustomInstallments = purchaseInInstallmentsRequest.CustomInstallments.Sum(x => x.Value);
 
                 if (totalCustomInstallments != purchaseInInstallments.TotalPrice)
-                {
-                    throw new Exception("O total das parcelas personalizadas não coincide com o valor total da compra.");
-                }
+                    return new BaseResponse(new List<string>() { "O total das parcelas personalizadas não coincide com o valor total da compra." });
 
                 foreach (var customInstallment in purchaseInInstallmentsRequest.CustomInstallments)
                 {
@@ -57,6 +55,39 @@ namespace Business.Services
             }
 
             return new BaseResponse<PurchaseInInstallmentsModel>(purchaseInInstallments.MapperEntitieToModel());
+        }
+
+        public async Task<BaseResponse> GetPurchaseInInstallments(GetPurchaseInInstallmentsRequest getPurchaseInInstallmentsRequest)
+        {
+            PurchaseInInstallments? purchaseInInstallments = await purchaseInInstallmentsRepositorie.GetPurchaseInInstallmentsAsync(getPurchaseInInstallmentsRequest.PurchaseInInstallmentsId);
+
+            if (purchaseInInstallments == null)
+                return new BaseResponse(new List<string>() { "Pagamento não encontrado" });
+
+            return new BaseResponse<PurchaseInInstallmentsModel>(purchaseInInstallments.MapperEntitieToModel());
+        }
+
+        public async Task<BaseResponse> GetPurchaseInInstallmentsListActive(GetPurchaseInInstallmentsListActiveRequest getPurchaseInInstallmentsListActiveRequest)
+        {
+            BaseResponse cardBaseResponse = await cardService.GetCardAsync(new GetCardRequest() { CardId = getPurchaseInInstallmentsListActiveRequest.CardId, UserId = getPurchaseInInstallmentsListActiveRequest .UserId});
+
+            if (!cardBaseResponse.Success)
+                return new BaseResponse(new List<string>() { "Cartão não encontrado!" });
+
+            CardModel cardModel = cardBaseResponse.GetEntitie<CardModel>();
+
+            List<PurchaseInInstallments>? installments = await purchaseInInstallmentsRepositorie.GetPurchaseInInstallmentsActiveAsync(cardModel.Id);
+
+            if (!installments.Any())
+                return new BaseResponse(new List<string>() { "Não possui dividas ativas!" });
+
+            List<PurchaseInInstallmentsModel> purchaseInInstallmentsModelList = installments.Select(x => x.MapperEntitieToModel()).ToList();
+
+            return new BaseResponse<GetPurchaseInInstallmentsListActiveModel>(new GetPurchaseInInstallmentsListActiveModel()
+            {
+                CardModel = cardModel,
+                PurchaseInInstallmentsModels = purchaseInInstallmentsModelList
+            });
         }
 
         private async Task InsertInstallmentsAsync(PurchaseInInstallments purchaseInInstallments, int index, decimal installmentValue)
@@ -85,37 +116,6 @@ namespace Business.Services
             };
 
             await installmentsRepositorie.InsertPurchaseInInstallmentsAsync(installments);
-        }
-
-        public async Task<BaseResponse> GetPurchaseInInstallments(GetPurchaseInInstallmentsRequest getPurchaseInInstallmentsRequest)
-        {
-            PurchaseInInstallments? purchaseInInstallments = await purchaseInInstallmentsRepositorie.GetPurchaseInInstallmentsAsync(getPurchaseInInstallmentsRequest.PurchaseInInstallmentsId);
-
-            if (purchaseInInstallments == null)
-                return new BaseResponse(new List<string>() { "Pagamento não encontrado" });
-
-            return new BaseResponse<PurchaseInInstallmentsModel>(purchaseInInstallments.MapperEntitieToModel());
-        }
-
-        public async Task<BaseResponse> GetPurchaseInInstallmentsListActive(long cardId, long userId)
-        {
-            BaseResponse cardBaseResponse = await cardService.GetCardAsync(new GetCardRequest() { CardId = cardId, UserId = userId });
-
-            if (!cardBaseResponse.Success)
-                return new BaseResponse(new List<string>() { "Cartão não encontrado!" });
-
-            List<PurchaseInInstallments>? installments = await purchaseInInstallmentsRepositorie.GetPurchaseInInstallmentsActiveAsync(cardId);
-
-            if (!installments.Any())
-                return new BaseResponse(new List<string>() { "Não possui dividas ativas!" });
-
-            List<PurchaseInInstallmentsModel> purchaseInInstallmentsModelList = installments.Select(x => x.MapperEntitieToModel()).ToList();
-
-            return new BaseResponse<GetPurchaseInInstallmentsListActiveModel>(new GetPurchaseInInstallmentsListActiveModel()
-            {
-                CardModel = cardBaseResponse.ReturnResult<CardModel>(),
-                PurchaseInInstallmentsModels = purchaseInInstallmentsModelList 
-            });
         }
     }
 }

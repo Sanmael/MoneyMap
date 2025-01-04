@@ -1,4 +1,5 @@
 ﻿using Business.Models;
+using Business.Requests.Card;
 using Business.Requests.Card.PurchaseInInstallments;
 using Domain.Cards.Entities;
 
@@ -14,7 +15,7 @@ namespace Business.Extensions
                 Name = card.Name,
                 User = new UserModel()
                 {
-                    Id = card.User.Id,
+                    Id = card.User!.Id,
                     Balance = card.User.Balance,
                     Name = card.User.Name,
                     Salary = card.User.Salary,
@@ -24,7 +25,7 @@ namespace Business.Extensions
                 CategorieId = card.CategorieId,
                 Categorie = new PurchaseCategorieModel()
                 {
-                    Name = card.Categorie.Name
+                    Name = card.Categorie!.Name
                 },
                 DueDate = card.DueDate,
                 Balance = card.Balance,
@@ -32,7 +33,22 @@ namespace Business.Extensions
                 Limit = card.Limit
             };
         }
+
+        public static Card MapInsertRequestToEntitie(this InsertCardRequest card)
+        {            
+            return new Card()
+            {
+                UserId = card.UserId,
+                DueDate = card.DueDate,
+                Name = card.Name,
+                Description = card.Description,
+                Limit = card.Limit,
+                Balance = card.Balance,
+                CategorieId = card.CategorieId
+            };
+        }
     }
+
     public static class PurchaseInInstallmentsExtension
     {
         public static PurchaseInInstallments MapperInsertRequestToEntitie(this InsertPurchaseInInstallmentsRequest purchaseInInstallments)

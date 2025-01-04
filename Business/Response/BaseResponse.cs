@@ -4,7 +4,10 @@ namespace Business.Response
 {
     public class BaseResponse
     {
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public List<string>? Errors { get; set; } = null;
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? Message { get; set; } = null;
 
         [JsonIgnore]
@@ -26,20 +29,19 @@ namespace Business.Response
     public class BaseResponse<T> : BaseResponse
     {
         public T Result { get; set; }
+
         public BaseResponse(T entitie) : base(true)
         {
             Result = entitie;
-        }        
+        }
     }
 
     public static class BaseResponseExtensions
     {
-        public static T ReturnResult<T>(this BaseResponse baseResponse)
+        public static T GetEntitie<T>(this BaseResponse baseResponse)
         {
             if (baseResponse is BaseResponse<T> responseConvert)
-            {
                 return responseConvert.Result;
-            }
 
             throw new InvalidCastException($"Cannot convert BaseResponse to BaseResponse<{typeof(T).Name}>.");
         }

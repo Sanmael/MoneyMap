@@ -1,9 +1,8 @@
 ﻿namespace Business.Requests.Card.PurchaseInInstallments
 {
-    public class InsertPurchaseInInstallmentsRequest
+    public class InsertPurchaseInInstallmentsRequest : BaseRequest
     {
-        public long CardId { get; set; }
-        public long UserId { get; set; }
+        public long CardId { get; set; }        
         public int NumberOfInstallments { get; set; }
         public decimal InstallmentValue { get; set; }
         public required string Name { get; set; }

@@ -1,17 +1,10 @@
-using Business.Interfaces;
-using Business.Services;
 using Data.Context;
-using Data.Repositories;
-using Data.Repositories.Cards;
-using Domain.Base.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using CardsAPI.EndPoints;
+using CardsAPI.Dependencies;
+
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
-    });
 
 // Add services to the container.
 builder.Services.AddDbContext<EntityFramework>(dboptions =>
@@ -19,17 +12,17 @@ builder.Services.AddDbContext<EntityFramework>(dboptions =>
     dboptions.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConfig"));
 });
 
-builder.Services.AddScoped<ICardService, CardService>();
-builder.Services.AddScoped<IPurchaseInInstallmentsService, PurchaseInInstallmentsService>();
-builder.Services.AddScoped<CardRepositorie>();
-builder.Services.AddScoped<InstallmentsRepositorie>();
-builder.Services.AddScoped<PurchaseInInstallmentsRepositorie>();
-builder.Services.AddScoped(typeof(IBaseRepositorie<>), typeof(BaseEntitieFrameworkRepositorie<>));
+builder.Services.AddCardDependencies();
 
+//WEB APP
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Error");
+    app.UseHsts();
+}
 
-//app.UseHttpsRedirection();
-app.MapControllers();
+app.MapCardEndPoints();
+app.MapPurchaseInInstallmentsEndPoints();
 app.Run();

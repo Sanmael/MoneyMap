@@ -1,8 +1,7 @@
 ﻿namespace Business.Requests.Card
 {
-    public record GetCardRequest
-    {
-        public long UserId { get; set; }
+    public class GetCardRequest : BaseRequest
+    {        
         public long CardId { get; set; }
     }
 }

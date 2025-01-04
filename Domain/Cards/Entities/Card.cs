@@ -9,15 +9,11 @@ namespace Domain.Cards.Entities
         public virtual User? User { get; set; }
         public virtual PurchaseCategorie? Categorie { get; set; }
         public DateTime DueDate { get; set; }
-        public string Name { get; set; }
+        public required string Name { get; set; }
         public string? Description { get; set; }
         public decimal Limit { get; set; }
         public decimal Balance { get; set; }
         public virtual List<PurchaseInInstallments>? PurchaseInInstallments { get; set; }
-
-        public Card()
-        {
-        }
 
         public bool IsValid()
         {

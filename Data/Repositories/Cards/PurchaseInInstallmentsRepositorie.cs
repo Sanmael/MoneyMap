@@ -25,14 +25,14 @@ namespace Data.Repositories.Cards
 
         public async Task<PurchaseInInstallments?> GetPurchaseInInstallmentsAsync(long purchaseInInstallmentsId)
         {
-            PurchaseInInstallments? purchaseInInstallments = await entityFramework.PurchaseInInstallments.Include(x => x.Installments).FirstAsync(x=> x.Id == purchaseInInstallmentsId);
+            PurchaseInInstallments? purchaseInInstallments = await entityFramework.PurchaseInInstallments.Include(x => x.Installments).FirstAsync(x => x.Id == purchaseInInstallmentsId);
 
             return purchaseInInstallments;
         }
 
         public async Task<List<PurchaseInInstallments>>? GetPurchaseInInstallmentsActiveAsync(long cardId)
         {
-            List<PurchaseInInstallments>? query = await entityFramework.PurchaseInInstallments.Include(x => x.Installments).Where(x=> x.CardId == cardId && !x.Paid).ToListAsync();
+            List<PurchaseInInstallments>? query = await entityFramework.PurchaseInInstallments.Include(x => x.Installments).Where(x => x.CardId == cardId && x.Card.UserId == cardId && !x.Paid).ToListAsync();
 
             return query;
         }
