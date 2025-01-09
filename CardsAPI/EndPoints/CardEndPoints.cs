@@ -16,8 +16,9 @@ namespace CardsAPI.EndPoints
                 if (!response.Success)
                     return Results.BadRequest(response);
 
-                return Results.Ok(response);
+                response.Location = $"/GetCard?userId={request.UserId}&cardId={response.GetEntitie<Guid>()}";
 
+                return Results.Created(response.Location, response);
             }).
             AddEndpointFilter<LoggerFilter>().
             AddEndpointFilter<ValidationFilter>();
@@ -27,10 +28,9 @@ namespace CardsAPI.EndPoints
                 BaseResponse response = await cardService.GetCardAsync(request);
 
                 if (!response.Success)
-                    return Results.BadRequest(response);
+                    return Results.NotFound(response);
 
                 return Results.Ok(response);
-
             }).
             AddEndpointFilter<LoggerFilter>().
             AddEndpointFilter<ValidationFilter>();

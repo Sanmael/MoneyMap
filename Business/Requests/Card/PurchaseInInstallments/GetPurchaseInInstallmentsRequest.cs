@@ -2,6 +2,6 @@
 {
     public class GetPurchaseInInstallmentsRequest : BaseRequest
     {
-        public long PurchaseInInstallmentsId { get; set; }
+        public Guid PurchaseInInstallmentsId { get; set; }
     }
 }

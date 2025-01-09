@@ -2,6 +2,6 @@
 {
     public class GetPurchaseInInstallmentsListActiveRequest : BaseRequest
     {
-        public long CardId { get; set; }
+        public Guid CardId { get; set; }
     }
 }

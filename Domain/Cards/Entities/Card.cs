@@ -4,8 +4,8 @@ namespace Domain.Cards.Entities
 {
     public class Card : BaseEntitie
     {
-        public long UserId { get; set; }
-        public long CategorieId { get; set; } 
+        public Guid UserId { get; set; }
+        public Guid CategorieId { get; set; } 
         public virtual User? User { get; set; }
         public virtual PurchaseCategorie? Categorie { get; set; }
         public DateTime DueDate { get; set; }

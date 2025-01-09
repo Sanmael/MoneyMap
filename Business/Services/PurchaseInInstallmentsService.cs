@@ -1,16 +1,17 @@
 ﻿using Business.Extensions;
 using Business.Interfaces;
 using Business.Models;
+using Business.Requests;
 using Business.Requests.Card;
 using Business.Requests.Card.PurchaseInInstallments;
 using Business.Response;
-using Data.Repositories.Cards;
+using Domain.Base.Interfaces.Repositories;
 using Domain.Cards.Entities;
 
 namespace Business.Services
 {
-    public class PurchaseInInstallmentsService(ICardService cardService, PurchaseInInstallmentsRepositorie purchaseInInstallmentsRepositorie,
-        InstallmentsRepositorie installmentsRepositorie) : IPurchaseInInstallmentsService
+    public class PurchaseInInstallmentsService(ICardService cardService, IPurchaseInInstallmentsRepositorie purchaseInInstallmentsRepositorie,
+        IInstallmentsRepositorie installmentsRepositorie) : IPurchaseInInstallmentsService
     {
         public async Task<BaseResponse> AddPurchaseInInstallmentsAsync(InsertPurchaseInInstallmentsRequest purchaseInInstallmentsRequest)
         {
@@ -21,7 +22,7 @@ namespace Business.Services
             });
 
             if (!response.Success)
-                return new BaseResponse(new List<string>() { "cartão não encontrado ou não pertence ao usuario" });
+                return new BaseResponse("cartão não encontrado ou não pertence ao usuario");
 
             PurchaseInInstallments purchaseInInstallments = purchaseInInstallmentsRequest.MapperInsertRequestToEntitie();
 
@@ -38,7 +39,7 @@ namespace Business.Services
                 decimal totalCustomInstallments = purchaseInInstallmentsRequest.CustomInstallments.Sum(x => x.Value);
 
                 if (totalCustomInstallments != purchaseInInstallments.TotalPrice)
-                    return new BaseResponse(new List<string>() { "O total das parcelas personalizadas não coincide com o valor total da compra." });
+                    return new BaseResponse("O total das parcelas personalizadas não coincide com o valor total da compra.");
 
                 foreach (var customInstallment in purchaseInInstallmentsRequest.CustomInstallments)
                 {
@@ -54,7 +55,7 @@ namespace Business.Services
                 }
             }
 
-            return new BaseResponse<PurchaseInInstallmentsModel>(purchaseInInstallments.MapperEntitieToModel());
+            return new BaseResponse<Guid>(purchaseInInstallments.Id, "Pagamento no cartão registrado com sucesso");
         }
 
         public async Task<BaseResponse> GetPurchaseInInstallments(GetPurchaseInInstallmentsRequest getPurchaseInInstallmentsRequest)
@@ -62,29 +63,31 @@ namespace Business.Services
             PurchaseInInstallments? purchaseInInstallments = await purchaseInInstallmentsRepositorie.GetPurchaseInInstallmentsAsync(getPurchaseInInstallmentsRequest.PurchaseInInstallmentsId);
 
             if (purchaseInInstallments == null)
-                return new BaseResponse(new List<string>() { "Pagamento não encontrado" });
+                return new BaseResponse("Pagamento não encontrado");
 
             return new BaseResponse<PurchaseInInstallmentsModel>(purchaseInInstallments.MapperEntitieToModel());
         }
 
         public async Task<BaseResponse> GetPurchaseInInstallmentsListActive(GetPurchaseInInstallmentsListActiveRequest getPurchaseInInstallmentsListActiveRequest)
         {
-            BaseResponse cardBaseResponse = await cardService.GetCardAsync(new GetCardRequest() { CardId = getPurchaseInInstallmentsListActiveRequest.CardId, UserId = getPurchaseInInstallmentsListActiveRequest .UserId});
+            BaseResponse cardBaseResponse = await cardService.GetCardAsync(new GetCardRequest() { CardId = getPurchaseInInstallmentsListActiveRequest.CardId, UserId = getPurchaseInInstallmentsListActiveRequest.UserId });
 
             if (!cardBaseResponse.Success)
-                return new BaseResponse(new List<string>() { "Cartão não encontrado!" });
+                return new BaseResponse("Cartão não encontrado!");
 
             CardModel cardModel = cardBaseResponse.GetEntitie<CardModel>();
 
-            List<PurchaseInInstallments>? installments = await purchaseInInstallmentsRepositorie.GetPurchaseInInstallmentsActiveAsync(cardModel.Id);
+            List<PurchaseInInstallments>? installments = await purchaseInInstallmentsRepositorie.GetPurchaseInInstallmentsActiveByCardIdAsync(cardModel.Id);
 
             if (!installments.Any())
-                return new BaseResponse(new List<string>() { "Não possui dividas ativas!" });
+                return new BaseResponse("Não possui dividas ativas!");
 
             List<PurchaseInInstallmentsModel> purchaseInInstallmentsModelList = installments.Select(x => x.MapperEntitieToModel()).ToList();
 
             return new BaseResponse<GetPurchaseInInstallmentsListActiveModel>(new GetPurchaseInInstallmentsListActiveModel()
             {
+                TotalDebt = purchaseInInstallmentsModelList.Select(x => x.InstallmentsModels.Where(installment => !installment.Paid).
+                Sum(installment => installment.Value)).Sum(),
                 CardModel = cardModel,
                 PurchaseInInstallmentsModels = purchaseInInstallmentsModelList
             });
@@ -116,6 +119,26 @@ namespace Business.Services
             };
 
             await installmentsRepositorie.InsertPurchaseInInstallmentsAsync(installments);
+        }
+
+        public async Task<BaseResponse> GetAllPurchaseInInstallmentsListActive(BaseRequest baseRequest)
+        {
+            List<PurchaseInInstallments>? installments = await purchaseInInstallmentsRepositorie.GetAllPurchaseInInstallmentsActiveAsync(baseRequest.UserId);
+            List<PurchaseInInstallmentsModel>? purchaseInInstallmentsModels = installments.Select(entity => entity.MapperEntitieToModel()).ToList();
+
+            BaseResponse response = await cardService.GetAllCardAsync(new GetAllCardsRequest() { UserId = baseRequest.UserId });
+
+            if (!response.Success)
+                return response;
+
+            List<CardModel> cardModels = response.GetEntitie<List<CardModel>>();
+
+            foreach (var cardModel in cardModels)
+            {                
+                cardModel.PurchaseInInstallmentsModels = purchaseInInstallmentsModels.Where(x=> x.CardId == cardModel.Id).ToList(); 
+            }
+
+            return new BaseResponse<List<CardModel>>(cardModels);          
         }
     }
 }

@@ -4,7 +4,7 @@ namespace Business.Requests
 {
     public class BaseRequest
     {
-        public long UserId { get; set; }       
+        public Guid UserId { get; set; }       
     }
 
     public static class BaseRequestExtensions

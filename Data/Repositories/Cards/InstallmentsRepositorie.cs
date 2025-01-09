@@ -1,11 +1,9 @@
-﻿using Data.Context;
-using Domain.Base.Interfaces;
+﻿using Domain.Base.Interfaces.Repositories;
 using Domain.Cards.Entities;
 
 namespace Data.Repositories.Cards
 {
-    public class InstallmentsRepositorie(IBaseRepositorie<Installments> baseRepositorie,
-        EntityFramework entityFramework)
+    public class InstallmentsRepositorie(IBaseRepositorie<Installments> baseRepositorie) : IInstallmentsRepositorie
     {
         public async Task InsertPurchaseInInstallmentsAsync(Installments baseEntitie)
         {

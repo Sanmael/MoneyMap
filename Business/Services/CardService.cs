@@ -3,26 +3,36 @@ using Business.Interfaces;
 using Business.Models;
 using Business.Requests.Card;
 using Business.Response;
-using Data.Repositories.Cards;
+using Domain.Base.Interfaces.Repositories;
 using Domain.Cards.Entities;
 
 namespace Business.Services
 {
-    public class CardService(CardRepositorie cardRepositorie) : ICardService
+    public class CardService(ICardRepositorie cardRepositorie) : ICardService
     {
         public async Task<BaseResponse> AddCardAsync(InsertCardRequest card)
         {
             Card? cardEntitie = card.MapInsertRequestToEntitie();
 
             if (cardEntitie == null)
-                return new BaseResponse(new List<string>() { "Cartão nao encontrado" });
+               return new BaseResponse("Cartão nao encontrado");
 
             if (!cardEntitie.IsValid())
-                return new BaseResponse(new List<string>() { "Cartão está vencido" });
+                return new BaseResponse("Cartão está vencido");
 
-            await cardRepositorie.InsertAsync(cardEntitie);
+            await cardRepositorie.InsertCardAsync(cardEntitie);
 
-            return new BaseResponse<CardModel>(cardEntitie.MapperEntitieToModel());
+            return new BaseResponse<Guid>(cardEntitie.Id, "cartão criado com sucesso");
+        }
+
+        public async Task<BaseResponse> GetAllCardAsync(GetAllCardsRequest card)
+        {
+            List<Card>? cards = await cardRepositorie.GetAllCardsAsync(card.UserId);
+
+            if(cards == null || cards.Count == 0)
+                return new BaseResponse("Não há cartões registrados");
+
+            return new BaseResponse<List<CardModel>>(cards.Select(x => x.MapperEntitieToModel()).ToList());
         }
 
         public async Task<BaseResponse> GetCardAsync(GetCardRequest card)
@@ -30,7 +40,7 @@ namespace Business.Services
             Card? cardEntitie = await cardRepositorie.GetCardAsync(card.UserId, card.CardId);
 
             if (cardEntitie == null)
-                return new BaseResponse(new List<string>() { "cartão não encontrado!" });
+                return new BaseResponse("cartão não encontrado!");
 
             return new BaseResponse<CardModel>(cardEntitie.MapperEntitieToModel());
         }
@@ -40,14 +50,14 @@ namespace Business.Services
             Card? card = await cardRepositorie.GetCardAsync(updateCard.UserId, updateCard.CardId);
 
             if (card == null)
-                return new BaseResponse(new List<string>() { "cartão não encontrado!" });
+                return new BaseResponse("cartão não encontrado!");
 
             card.Balance = updateCard.Balance;
 
             if (updateCard.Balance < 0)
-                return new BaseResponse(new List<string>() { "Balance do cartão não pode ser negativo" });
+                return new BaseResponse("Balance do cartão não pode ser negativo");
             
-            await cardRepositorie.UpdateAsync(card);
+            await cardRepositorie.UpdateCardAsync(card);
 
             return new BaseResponse<CardModel>(card.MapperEntitieToModel());
         }

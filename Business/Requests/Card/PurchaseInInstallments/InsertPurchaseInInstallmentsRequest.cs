@@ -2,12 +2,12 @@
 {
     public class InsertPurchaseInInstallmentsRequest : BaseRequest
     {
-        public long CardId { get; set; }        
+        public Guid CardId { get; set; }        
         public int NumberOfInstallments { get; set; }
         public decimal InstallmentValue { get; set; }
         public required string Name { get; set; }
         public string? Description { get; set; }
-        public long? CategorieId { get; set; }
+        public Guid? CategorieId { get; set; }
         public DateTime DateOfPurchase { get; set; }
         public List<CustomizedInstallment>? CustomInstallments { get; set; }
 

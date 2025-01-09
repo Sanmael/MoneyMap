@@ -1,12 +1,14 @@
 ﻿using Data.Context;
-using Domain.Base.Interfaces;
+using Domain.Base.Interfaces.Repositories;
 using Domain.Cards.Entities;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Bson;
+using MongoDB.Driver;
 
 namespace Data.Repositories.Cards
 {
-    public class PurchaseInInstallmentsRepositorie(IBaseRepositorie<PurchaseInInstallments> baseRepositorie,
-        EntityFramework entityFramework)
+    public class PurchaseInInstallmentsRepositorie(IBaseRepositorie<PurchaseInInstallments> baseRepositorie, MongoDBContext mongoDBContext)
+        : IPurchaseInInstallmentsRepositorie
     {
         public async Task DeletePurchaseInInstallmentsAsync(PurchaseInInstallments baseEntitie)
         {
@@ -23,18 +25,75 @@ namespace Data.Repositories.Cards
             await baseRepositorie.Update(baseEntitie);
         }
 
-        public async Task<PurchaseInInstallments?> GetPurchaseInInstallmentsAsync(long purchaseInInstallmentsId)
+        public async Task<PurchaseInInstallments?> GetPurchaseInInstallmentsAsync(Guid purchaseInInstallmentsId)
         {
-            PurchaseInInstallments? purchaseInInstallments = await entityFramework.PurchaseInInstallments.Include(x => x.Installments).FirstAsync(x => x.Id == purchaseInInstallmentsId);
+            var query = new[]
+            {
+                new BsonDocument("$match", new BsonDocument
+                {
+                    { "_id", new BsonBinaryData(purchaseInInstallmentsId, GuidRepresentation.Standard) },
+                }),
+                new BsonDocument("$lookup", new BsonDocument
+                {
+                    { "from", "Installments" },
+                    { "localField", "_id" },
+                    { "foreignField", "PurchaseInInstallmentsId" },
+                    { "as", "Installments" }
+                })
+            };
 
-            return purchaseInInstallments;
+            var result = await mongoDBContext.GetCollection<PurchaseInInstallments>()
+                   .AggregateAsync<PurchaseInInstallments>(query);
+
+            return await result.FirstAsync();
         }
 
-        public async Task<List<PurchaseInInstallments>>? GetPurchaseInInstallmentsActiveAsync(long cardId)
+        public async Task<List<PurchaseInInstallments>>? GetPurchaseInInstallmentsActiveByCardIdAsync(Guid cardId)
         {
-            List<PurchaseInInstallments>? query = await entityFramework.PurchaseInInstallments.Include(x => x.Installments).Where(x => x.CardId == cardId && x.Card.UserId == cardId && !x.Paid).ToListAsync();
+            var query = new[]
+            {
+                new BsonDocument("$match", new BsonDocument
+                {
+                    { "CardId", new BsonBinaryData(cardId, GuidRepresentation.Standard) },
+                    { "Paid", false }
+                }),
+                new BsonDocument("$lookup", new BsonDocument
+                {
+                    { "from", "Installments" },
+                    { "localField", "_id" },
+                    { "foreignField", "PurchaseInInstallmentsId" },
+                    { "as", "Installments" }
+                })
+            };
 
-            return query;
+            var result = await mongoDBContext.GetCollection<PurchaseInInstallments>()
+                    .AggregateAsync<PurchaseInInstallments>(query);
+
+            return await result.ToListAsync();
+        }
+
+        public async Task<List<PurchaseInInstallments>>? GetAllPurchaseInInstallmentsActiveAsync(Guid userId)
+        {
+            var query = new[]
+            {
+                new BsonDocument("$match", new BsonDocument
+                {
+                    { "UserId", new BsonBinaryData(userId, GuidRepresentation.Standard) },
+                    { "Paid", false }
+                }),
+                new BsonDocument("$lookup", new BsonDocument
+                {
+                    { "from", "Installments" },
+                    { "localField", "_id" },
+                    { "foreignField", "PurchaseInInstallmentsId" },
+                    { "as", "Installments" }
+                })
+            };
+
+            var result = await mongoDBContext.GetCollection<PurchaseInInstallments>()
+                   .AggregateAsync<PurchaseInInstallments>(query);
+
+            return await result.ToListAsync();
         }
     }
 }

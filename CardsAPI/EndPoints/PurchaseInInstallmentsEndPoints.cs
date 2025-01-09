@@ -1,5 +1,6 @@
 ﻿using Business.Handlers.Filters;
 using Business.Interfaces;
+using Business.Requests;
 using Business.Requests.Card.PurchaseInInstallments;
 using Business.Response;
 
@@ -16,8 +17,9 @@ namespace CardsAPI.EndPoints
                 if (!response.Success)
                     return Results.BadRequest(response);
 
-                return Results.Ok(response);
+                response.Location = $"/GetPurchaseInInstallments?userId={request.UserId}&purchaseInInstallmentsId={response.GetEntitie<Guid>()}";
 
+                return Results.Created(response.Location, response);
             }).
             AddEndpointFilter<LoggerFilter>().
             AddEndpointFilter<ValidationFilter>();
@@ -27,23 +29,33 @@ namespace CardsAPI.EndPoints
                 BaseResponse response = await service.GetPurchaseInInstallments(request);
 
                 if (!response.Success)
-                    return Results.BadRequest(response);
+                    return Results.NotFound(response);
 
                 return Results.Ok(response);
-
             }).
             AddEndpointFilter<LoggerFilter>().
             AddEndpointFilter<ValidationFilter>();
 
-            app.MapGet("/GetPurchaseInInstallmentsListActive", async ([AsParameters] GetPurchaseInInstallmentsListActiveRequest request, IPurchaseInInstallmentsService service) =>
+            app.MapGet("/GetPurchaseInInstallmentsListActiveByCardId", async ([AsParameters] GetPurchaseInInstallmentsListActiveRequest request, IPurchaseInInstallmentsService service) =>
             {
                 BaseResponse response = await service.GetPurchaseInInstallmentsListActive(request);
 
                 if (!response.Success)
-                    return Results.BadRequest(response);
+                    return Results.NotFound(response);
 
                 return Results.Ok(response);
+                }).
+            AddEndpointFilter<LoggerFilter>().
+            AddEndpointFilter<ValidationFilter>();
 
+            app.MapGet("/GetAllPurchaseInInstallmentsListActive", async ([AsParameters] BaseRequest request, IPurchaseInInstallmentsService service) =>
+            {
+                BaseResponse response = await service.GetAllPurchaseInInstallmentsListActive(request);
+
+                if (!response.Success)
+                    return Results.NotFound(response);
+
+                return Results.Ok(response);
             }).
             AddEndpointFilter<LoggerFilter>().
             AddEndpointFilter<ValidationFilter>();

@@ -7,6 +7,7 @@ namespace Business.Interfaces
     {
         public Task<BaseResponse> AddCardAsync(InsertCardRequest card);
         public Task<BaseResponse> GetCardAsync(GetCardRequest card);
+        public Task<BaseResponse> GetAllCardAsync(GetAllCardsRequest card);
         public Task<BaseResponse> UpdateBalanceCardAsync(UpdateBalanceCardRequest card);
     }
 }

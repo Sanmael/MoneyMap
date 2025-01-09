@@ -16,6 +16,7 @@ namespace Data.Context
         public DbSet<PurchaseCategorie> Categorie { get; set; }
         public DbSet<PurchaseInInstallments> PurchaseInInstallments { get; set; }
         public DbSet<Installments> Installments { get; set; }
+        public DbSet<Purchase> Purchase { get; set; }
 
     }
 }
