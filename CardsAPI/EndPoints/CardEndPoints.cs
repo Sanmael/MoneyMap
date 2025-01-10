@@ -16,7 +16,7 @@ namespace CardsAPI.EndPoints
                 if (!response.Success)
                     return Results.BadRequest(response);
 
-                response.Location = $"/GetCard?userId={request.UserId}&cardId={response.GetEntitie<Guid>()}";
+                response.Location = $"/GetCard?userId={request.UserId}&cardId={response.GetData<Guid>()}";
 
                 return Results.Created(response.Location, response);
             }).

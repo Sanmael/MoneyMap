@@ -17,7 +17,7 @@ namespace PurchaseAPI.EndPoints
                 if (!response.Success)
                     return Results.BadRequest(response);
 
-                response.Location = $"/GetPurchase?userId={request.UserId}&purchaseId={response.GetEntitie<Guid>()}";
+                response.Location = $"/GetPurchase?userId={request.UserId}&purchaseId={response.GetData<Guid>()}";
 
                 return Results.Created(response.Location, response);
             }).

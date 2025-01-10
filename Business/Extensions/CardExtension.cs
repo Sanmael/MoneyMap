@@ -13,16 +13,16 @@ namespace Business.Extensions
             CardModel cardModel = new CardModel
             {
                 Id = card.Id,
-                Name = card.Name,              
+                Name = card.Name,
                 UserId = card.UserId,
-                CategorieId = card.CategorieId,               
+                CategorieId = card.CategorieId,
                 DueDate = card.DueDate,
                 Balance = card.Balance,
                 Description = card.Description,
                 Limit = card.Limit
             };
 
-            if(card.User != null)
+            if (card.User != null)
             {
                 cardModel.User = new UserModel()
                 {
@@ -34,7 +34,7 @@ namespace Business.Extensions
                 };
             }
 
-            if(card.Categorie != null)
+            if (card.Categorie != null)
             {
                 cardModel.Categorie = new PurchaseCategorieModel()
                 {
@@ -46,7 +46,7 @@ namespace Business.Extensions
         }
 
         public static Card MapInsertRequestToEntitie(this InsertCardRequest card)
-        {            
+        {
             return new Card()
             {
                 UserId = card.UserId,
@@ -69,14 +69,27 @@ namespace Business.Extensions
                 DateOfPurchase = purchaseInInstallments.DateOfPurchase,
                 TotalPrice = purchaseInInstallments.GetTotalValue(),
                 UserId = purchaseInInstallments.UserId,
-                CardId = purchaseInInstallments.CardId,                
+                CardId = purchaseInInstallments.CardId,
                 Name = purchaseInInstallments.Name,
                 Description = purchaseInInstallments.Description,
                 CategorieId = purchaseInInstallments.CategorieId
             };
         }
 
-        public static PurchaseInInstallmentsModel MapperEntitieToModel(this PurchaseInInstallments entitie)
+        private static List<InstallmentsModel> MapInstallments(List<Installments> installments)
+        {
+            return installments.Select(installment => new InstallmentsModel
+            {
+                Id = installment.Id,
+                Value = installment.Value,
+                PurchaseInInstallmentsId = installment.PurchaseInInstallmentsId,
+                InstallmentNumber = installment.InstallmentNumber,
+                ReferringMonth = installment.ReferringMonth,
+                Paid = installment.Paid
+            }).ToList();
+        }
+
+        public static PurchaseInInstallmentsModel MapperEntitieToModel(this PurchaseInInstallments entitie, List<Installments>? installments = null)
         {
             PurchaseInInstallmentsModel purchaseInInstallmentsModel = new PurchaseInInstallmentsModel
             {
@@ -86,27 +99,25 @@ namespace Business.Extensions
                 Name = entitie.Name,
                 Description = entitie.Description,
                 TotalPrice = entitie.TotalPrice,
-                CategorieId = entitie.CategorieId                
+                CategorieId = entitie.CategorieId,
+                InstallmentsModels = new List<InstallmentsModel>()
             };
 
-            if(entitie.Installments != null && entitie.Installments.Any())
+            if (entitie.Installments != null)
             {
-                purchaseInInstallmentsModel.InstallmentsModels = new List<InstallmentsModel>();
-                purchaseInInstallmentsModel.NumberOfInstallments = entitie.Installments.Count;
-
-                foreach (var installment in entitie.Installments)
-                {
-                    purchaseInInstallmentsModel.InstallmentsModels.Add(new InstallmentsModel()
-                    {
-                        Id = installment.Id,
-                        Value = installment.Value,
-                        PurchaseInInstallmentsId = installment.PurchaseInInstallmentsId,
-                        InstallmentNumber = installment.InstallmentNumber,
-                        ReferringMonth = installment.ReferringMonth,
-                        Paid = installment.Paid
-                    });
-                }
+                purchaseInInstallmentsModel.InstallmentsModels.AddRange(MapInstallments(entitie.Installments));
             }
+
+            if (installments != null)
+            {
+                var newInstallments = MapInstallments(installments)
+                    .Where(x => !purchaseInInstallmentsModel.InstallmentsModels.Any(existing => existing.Id == x.Id))
+                    .ToList();
+
+                purchaseInInstallmentsModel.InstallmentsModels.AddRange(newInstallments);
+            }
+
+            purchaseInInstallmentsModel.NumberOfInstallments = purchaseInInstallmentsModel.InstallmentsModels.Count;
 
             return purchaseInInstallmentsModel;
         }

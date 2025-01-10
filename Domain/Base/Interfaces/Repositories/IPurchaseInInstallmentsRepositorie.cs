@@ -10,5 +10,6 @@ namespace Domain.Base.Interfaces.Repositories
         public Task<PurchaseInInstallments?> GetPurchaseInInstallmentsAsync(Guid purchaseInInstallmentsId);
         public Task<List<PurchaseInInstallments>>? GetPurchaseInInstallmentsActiveByCardIdAsync(Guid cardId);
         public Task<List<PurchaseInInstallments>>? GetAllPurchaseInInstallmentsActiveAsync(Guid userId);
+        public Task<List<PurchaseInInstallments>> GetAllPurchaseInInstallmentsByDateAsync(Guid userId, DateTime? firstDate, DateTime? lastDate);
     }
 }

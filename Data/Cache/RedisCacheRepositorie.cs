@@ -9,16 +9,34 @@ namespace Data.Cache
     {
         public async Task SaveCache<T>(T entity, string id, [CallerMemberName] string callerName = "")
         {
-            string serializedEntity = JsonSerializer.Serialize(entity, GetOptions());
-            string key = callerName + id;
-            await distributedCache.SetStringAsync(key, serializedEntity);
+            try
+            {
+                string serializedEntity = JsonSerializer.Serialize(entity, GetOptions());
+                string key = callerName + id;
+                await distributedCache.SetStringAsync(key, serializedEntity);
+            }
+
+            catch (Exception)
+            {
+                //Mapear exeção salvando arquivo de log futuramente 
+            }
         }
 
         public async Task<T?> GetCache<T>(string id, [CallerMemberName] string callerName = "")
         {
-            string key = callerName + id;
-            string? cached = await distributedCache.GetStringAsync(key);           
-            return !string.IsNullOrEmpty(cached) ? JsonSerializer.Deserialize<T>(cached!, GetOptions()) : default;
+            try
+            {
+                string key = callerName + id;
+                string? cached = await distributedCache.GetStringAsync(key);
+
+                return !string.IsNullOrEmpty(cached) ? JsonSerializer.Deserialize<T>(cached!, GetOptions()) : default;
+            }
+
+            catch (Exception)
+            {
+                //Mapear exeção salvando arquivo de log futuramente 
+                return default;
+            }
         }
 
         //TODO : Remover metodo apos corrigir a ciclagem nos objetos
@@ -32,8 +50,15 @@ namespace Data.Cache
         }
 
         public async Task RemoveCache(string id)
-        {            
-            await distributedCache.RemoveAsync(id);
+        {
+            try
+            {
+                await distributedCache.RemoveAsync(id);
+            }
+            catch (Exception)
+            {
+                //Mapear exeção salvando arquivo de log futuramente                 
+            }
         }
     }
 }

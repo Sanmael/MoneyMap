@@ -17,7 +17,7 @@ namespace CardsAPI.EndPoints
                 if (!response.Success)
                     return Results.BadRequest(response);
 
-                response.Location = $"/GetPurchaseInInstallments?userId={request.UserId}&purchaseInInstallmentsId={response.GetEntitie<Guid>()}";
+                response.Location = $"/GetPurchaseInInstallments?userId={request.UserId}&purchaseInInstallmentsId={response.GetData<Guid>()}";
 
                 return Results.Created(response.Location, response);
             }).
@@ -59,6 +59,32 @@ namespace CardsAPI.EndPoints
             }).
             AddEndpointFilter<LoggerFilter>().
             AddEndpointFilter<ValidationFilter>();
+
+
+            app.MapGet("/GetAllPurchaseInInstallmentsListActiveByDate", async ([AsParameters] GetAllPurchaseInInstallmentsListActiveByDateRequest request, IPurchaseInInstallmentsService service) =>
+            {
+                BaseResponse response = await service.GetAllPurchaseInInstallmentsListActiveByDate(request);
+
+                if (!response.Success)
+                    return Results.NotFound(response);
+
+                return Results.Ok(response);
+            }).
+            AddEndpointFilter<LoggerFilter>().
+            AddEndpointFilter<ValidationFilter>();
+
+
+            app.MapGet("/GetActiveInstallmentsByMonthAsync", async ([AsParameters] GetActiveInstallmentsByMonthAsyncRequest request, IPurchaseInInstallmentsService service) =>
+            {
+                BaseResponse response = await service.GetActiveInstallmentsByMonthAsync(request);
+
+                if (!response.Success)
+                    return Results.NotFound(response);
+
+                return Results.Ok(response);
+            }).
+           AddEndpointFilter<LoggerFilter>().
+           AddEndpointFilter<ValidationFilter>();
         }
     }
 }

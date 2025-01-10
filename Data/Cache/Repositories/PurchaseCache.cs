@@ -20,6 +20,11 @@ namespace Data.Cache.Repositories
             return purchaseList;
         }
 
+        public Task<List<Purchase>> GetPurchaseActiveByDate(Guid userId, DateTime? firstDate, DateTime? lastDate)
+        {
+            return purchaseRepositorie.GetPurchaseActiveByDate(userId, firstDate, lastDate);
+        }
+
         public async Task<Purchase?> GetPurchaseAsync(Guid purchaseId)
         {
             Purchase? purchase = await redisCacheRepositorie.GetCache<Purchase>(purchaseId.ToString());

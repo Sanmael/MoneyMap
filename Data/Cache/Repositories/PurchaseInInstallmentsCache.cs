@@ -77,5 +77,10 @@ namespace Data.Cache.Repositories
             await redisCacheRepositorie.RemoveCache(nameof(GetPurchaseInInstallmentsActiveByCardIdAsync) + purchaseInInstallments.Card.Id);
             await redisCacheRepositorie.RemoveCache(nameof(GetAllPurchaseInInstallmentsActiveAsync) + purchaseInInstallments.UserId);
         }
+
+        public Task<List<PurchaseInInstallments>> GetAllPurchaseInInstallmentsByDateAsync(Guid userId, DateTime? firstDate, DateTime? lastDate)
+        {
+            return purchaseInInstallmentsRepositorie.GetAllPurchaseInInstallmentsByDateAsync(userId, firstDate, lastDate);
+        }
     }
 }

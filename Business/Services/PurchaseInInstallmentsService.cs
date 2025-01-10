@@ -26,7 +26,7 @@ namespace Business.Services
 
             PurchaseInInstallments purchaseInInstallments = purchaseInInstallmentsRequest.MapperInsertRequestToEntitie();
 
-            CardModel card = response.GetEntitie<CardModel>();
+            CardModel card = response.GetData<CardModel>();
 
             decimal newBalance = card.Balance - purchaseInInstallments.TotalPrice;
 
@@ -75,7 +75,7 @@ namespace Business.Services
             if (!cardBaseResponse.Success)
                 return new BaseResponse("Cartão não encontrado!");
 
-            CardModel cardModel = cardBaseResponse.GetEntitie<CardModel>();
+            CardModel cardModel = cardBaseResponse.GetData<CardModel>();
 
             List<PurchaseInInstallments>? installments = await purchaseInInstallmentsRepositorie.GetPurchaseInInstallmentsActiveByCardIdAsync(cardModel.Id);
 
@@ -131,7 +131,7 @@ namespace Business.Services
             if (!response.Success)
                 return response;
 
-            List<CardModel> cardModels = response.GetEntitie<List<CardModel>>();
+            List<CardModel> cardModels = response.GetData<List<CardModel>>();
 
             foreach (var cardModel in cardModels)
             {                
@@ -139,6 +139,58 @@ namespace Business.Services
             }
 
             return new BaseResponse<List<CardModel>>(cardModels);          
+        }
+
+        public async Task<BaseResponse> GetAllPurchaseInInstallmentsListActiveByDate(GetAllPurchaseInInstallmentsListActiveByDateRequest getAllPurchaseInInstallmentsListActiveByDateRequest)
+        {
+            List<PurchaseInInstallments>? installments = await purchaseInInstallmentsRepositorie.GetAllPurchaseInInstallmentsByDateAsync
+                (getAllPurchaseInInstallmentsListActiveByDateRequest.UserId,getAllPurchaseInInstallmentsListActiveByDateRequest.FirstDate,getAllPurchaseInInstallmentsListActiveByDateRequest.LastDate);
+
+            List<PurchaseInInstallmentsModel>? purchaseInInstallmentsModels = installments.Select(entity => entity.MapperEntitieToModel()).ToList();
+
+            BaseResponse response = await cardService.GetAllCardAsync(new GetAllCardsRequest() { UserId = getAllPurchaseInInstallmentsListActiveByDateRequest.UserId });
+
+            if (!response.Success)
+                return response;
+
+            List<CardModel> cardModels = response.GetData<List<CardModel>>();
+
+            foreach (var cardModel in cardModels)
+            {
+                cardModel.PurchaseInInstallmentsModels = purchaseInInstallmentsModels.Where(x => x.CardId == cardModel.Id).ToList();
+            }
+
+            return new BaseResponse<List<CardModel>>(cardModels);
+        }
+
+        public async Task<BaseResponse> GetActiveInstallmentsByMonthAsync(GetActiveInstallmentsByMonthAsyncRequest getActiveInstallmentsByMonthAsyncRequest)
+        {
+            List<Installments?> installments = await installmentsRepositorie.GetActiveInstallmentsByMonthAsync(getActiveInstallmentsByMonthAsyncRequest.UserId, getActiveInstallmentsByMonthAsyncRequest.StartMonth, getActiveInstallmentsByMonthAsyncRequest.EndMonth);
+
+            var groupedInstallments = installments
+                .Where(x => x != null)
+                .GroupBy(x => x!.PurchaseInInstallmentsId)
+                .Select(group =>
+                {
+                    var purchaseInInstallments = group.First()!.PurchaseInInstallments;
+                    var installmentsList = group.ToList();
+                    return purchaseInInstallments.MapperEntitieToModel(installmentsList);
+
+                }).ToList();
+
+            BaseResponse response = await cardService.GetAllCardAsync(new GetAllCardsRequest() { UserId = getActiveInstallmentsByMonthAsyncRequest.UserId });
+
+            if (!response.Success)
+                return response;
+
+            List<CardModel> cardModels = response.GetData<List<CardModel>>();
+
+            foreach (var cardModel in cardModels)
+            {
+                cardModel.PurchaseInInstallmentsModels = groupedInstallments.Where(x => x.CardId == cardModel.Id).ToList();
+            }
+
+            return new BaseResponse<List<CardModel>>(cardModels);
         }
     }
 }

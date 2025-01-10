@@ -36,22 +36,22 @@ namespace Business.Response
 
     public class BaseResponse<T> : BaseResponse
     {
-        public T Result { get; set; }
+        public T Data { get; set; }
 
         public BaseResponse(T entitie) : base(true)
         {
-            Result = entitie;
+            Data = entitie;
         }
 
         public BaseResponse(T entitie, string message) : base(true, message)
         {
-            Result = entitie;
+            Data = entitie;
         }
 
         [JsonConstructor]
         public BaseResponse(T result, bool success = true, string message = "") : base(true, message)
         {
-            Result = result;
+            Data = result;
             Success = success;
             Message = message;
         }
@@ -59,10 +59,10 @@ namespace Business.Response
 
     public static class BaseResponseExtensions
     {
-        public static T GetEntitie<T>(this BaseResponse baseResponse)
+        public static T GetData<T>(this BaseResponse baseResponse)
         {
             if (baseResponse is BaseResponse<T> responseConvert)
-                return responseConvert.Result;
+                return responseConvert.Data;
 
             throw new InvalidCastException($"Cannot convert BaseResponse to BaseResponse<{typeof(T).Name}>.");
         }

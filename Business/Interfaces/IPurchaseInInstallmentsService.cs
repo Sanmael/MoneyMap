@@ -10,5 +10,7 @@ namespace Business.Interfaces
         public Task<BaseResponse> GetPurchaseInInstallments(GetPurchaseInInstallmentsRequest getPurchaseInInstallmentsRequest);
         public Task<BaseResponse> GetPurchaseInInstallmentsListActive(GetPurchaseInInstallmentsListActiveRequest getPurchaseInInstallmentsListActiveRequest);
         public Task<BaseResponse> GetAllPurchaseInInstallmentsListActive(BaseRequest baseRequest);
+        public Task<BaseResponse> GetAllPurchaseInInstallmentsListActiveByDate(GetAllPurchaseInInstallmentsListActiveByDateRequest getAllPurchaseInInstallmentsListActiveByDateRequest);
+        public Task<BaseResponse> GetActiveInstallmentsByMonthAsync(GetActiveInstallmentsByMonthAsyncRequest getActiveInstallmentsByMonthAsyncRequest);
     }
 }
