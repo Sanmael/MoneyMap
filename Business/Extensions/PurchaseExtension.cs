@@ -15,7 +15,6 @@ namespace Business.Extensions
                 Name = insertPurchaseRequest.Name,
                 Description = insertPurchaseRequest.Description,
                 CategorieId = insertPurchaseRequest.CategorieId,
-                Paid = false,
                 TotalPrice = insertPurchaseRequest.Value
             };
         }

@@ -60,7 +60,6 @@ namespace CardsAPI.EndPoints
             AddEndpointFilter<LoggerFilter>().
             AddEndpointFilter<ValidationFilter>();
 
-
             app.MapGet("/GetAllPurchaseInInstallmentsListActiveByDate", async ([AsParameters] GetAllPurchaseInInstallmentsListActiveByDateRequest request, IPurchaseInInstallmentsService service) =>
             {
                 BaseResponse response = await service.GetAllPurchaseInInstallmentsListActiveByDate(request);
@@ -72,7 +71,6 @@ namespace CardsAPI.EndPoints
             }).
             AddEndpointFilter<LoggerFilter>().
             AddEndpointFilter<ValidationFilter>();
-
 
             app.MapGet("/GetActiveInstallmentsByMonthAsync", async ([AsParameters] GetActiveInstallmentsByMonthAsyncRequest request, IPurchaseInInstallmentsService service) =>
             {

@@ -38,22 +38,16 @@ namespace Business.Response
     {
         public T Data { get; set; }
 
-        public BaseResponse(T entitie) : base(true)
+        public BaseResponse() : base(true) { }
+
+        public BaseResponse(T data) : base(true)
         {
-            Data = entitie;
+            Data = data;
         }
 
-        public BaseResponse(T entitie, string message) : base(true, message)
+        public BaseResponse(T data, string message) : base(true, message)
         {
-            Data = entitie;
-        }
-
-        [JsonConstructor]
-        public BaseResponse(T result, bool success = true, string message = "") : base(true, message)
-        {
-            Data = result;
-            Success = success;
-            Message = message;
+            Data = data;
         }
     }
 

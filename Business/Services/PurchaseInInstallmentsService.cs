@@ -167,13 +167,16 @@ namespace Business.Services
         {
             List<Installments?> installments = await installmentsRepositorie.GetActiveInstallmentsByMonthAsync(getActiveInstallmentsByMonthAsyncRequest.UserId, getActiveInstallmentsByMonthAsyncRequest.StartMonth, getActiveInstallmentsByMonthAsyncRequest.EndMonth);
 
-            var groupedInstallments = installments
+            if (installments == null || installments.Count == 0)
+                return new BaseResponse("Não existem pagamentos");
+
+            List<PurchaseInInstallmentsModel> groupedInstallments = installments
                 .Where(x => x != null)
                 .GroupBy(x => x!.PurchaseInInstallmentsId)
                 .Select(group =>
                 {
-                    var purchaseInInstallments = group.First()!.PurchaseInInstallments;
-                    var installmentsList = group.ToList();
+                    PurchaseInInstallments purchaseInInstallments = group.First()!.PurchaseInInstallments;
+                    List<Installments> installmentsList = group.ToList();
                     return purchaseInInstallments.MapperEntitieToModel(installmentsList);
 
                 }).ToList();
@@ -183,14 +186,17 @@ namespace Business.Services
             if (!response.Success)
                 return response;
 
-            List<CardModel> cardModels = response.GetData<List<CardModel>>();
+            List<CardModel> cardModels = response
+                .GetData<List<CardModel>>()
+                .Where(card => groupedInstallments.Any(installment => installment.CardId == card.Id))
+                .ToList();
 
             foreach (var cardModel in cardModels)
             {
                 cardModel.PurchaseInInstallmentsModels = groupedInstallments.Where(x => x.CardId == cardModel.Id).ToList();
             }
 
-            return new BaseResponse<List<CardModel>>(cardModels);
+            return new BaseResponse<List<CardModel>>(cardModels, "Cartões recuperados com sucesso");
         }
     }
 }

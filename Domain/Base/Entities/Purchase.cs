@@ -10,7 +10,7 @@ namespace Domain.Base.Entities
         public string? Description { get; set; }
         public decimal TotalPrice { get; set; }
         public Guid? CategorieId { get; set; }
-        public bool Paid { get; set; }
+        public bool Paid { get; set; } = true;
         public virtual PurchaseCategorie? Categorie { get; set; } 
     }
 }
