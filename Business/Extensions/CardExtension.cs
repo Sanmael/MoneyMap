@@ -1,8 +1,7 @@
 ﻿using Business.Models;
 using Business.Requests.Card;
 using Business.Requests.Card.PurchaseInInstallments;
-using Domain.Base.Entities;
-using Domain.Cards.Entities;
+using Domain.Entities;
 
 namespace Business.Extensions
 {

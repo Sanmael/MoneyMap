@@ -3,11 +3,13 @@ using Business.Interfaces;
 using Business.Requests;
 using Business.Requests.Card.PurchaseInInstallments;
 using Business.Response;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CardsAPI.EndPoints
 {
     public static class PurchaseInInstallmentsEndPoints
     {
+        [Authorize]
         public static void MapPurchaseInInstallmentsEndPoints(this WebApplication app)
         {
             app.MapPost("/AddPurchaseInInstallments", async (InsertPurchaseInInstallmentsRequest request, IPurchaseInInstallmentsService service) =>
@@ -21,6 +23,8 @@ namespace CardsAPI.EndPoints
 
                 return Results.Created(response.Location, response);
             }).
+            RequireAuthorization()
+            .AddEndpointFilter<TokenValidationMiddleware>().
             AddEndpointFilter<LoggerFilter>().
             AddEndpointFilter<ValidationFilter>();
 
@@ -33,6 +37,7 @@ namespace CardsAPI.EndPoints
 
                 return Results.Ok(response);
             }).
+            RequireAuthorization().
             AddEndpointFilter<LoggerFilter>().
             AddEndpointFilter<ValidationFilter>();
 
@@ -44,11 +49,12 @@ namespace CardsAPI.EndPoints
                     return Results.NotFound(response);
 
                 return Results.Ok(response);
-                }).
+            }).
+            RequireAuthorization().
             AddEndpointFilter<LoggerFilter>().
             AddEndpointFilter<ValidationFilter>();
 
-            app.MapGet("/GetAllPurchaseInInstallmentsListActive", async ([AsParameters] BaseRequest request, IPurchaseInInstallmentsService service) =>
+            app.MapGet("/GetAllPurchaseInInstallmentsListActive", async ([AsParameters] GetAllPurchaseInInstallmentsListActiveRequest request, IPurchaseInInstallmentsService service) =>
             {
                 BaseResponse response = await service.GetAllPurchaseInInstallmentsListActive(request);
 
@@ -57,6 +63,7 @@ namespace CardsAPI.EndPoints
 
                 return Results.Ok(response);
             }).
+            RequireAuthorization().
             AddEndpointFilter<LoggerFilter>().
             AddEndpointFilter<ValidationFilter>();
 
@@ -69,6 +76,7 @@ namespace CardsAPI.EndPoints
 
                 return Results.Ok(response);
             }).
+            RequireAuthorization().
             AddEndpointFilter<LoggerFilter>().
             AddEndpointFilter<ValidationFilter>();
 
@@ -81,8 +89,9 @@ namespace CardsAPI.EndPoints
 
                 return Results.Ok(response);
             }).
-           AddEndpointFilter<LoggerFilter>().
-           AddEndpointFilter<ValidationFilter>();
+            RequireAuthorization().
+            AddEndpointFilter<LoggerFilter>().
+            AddEndpointFilter<ValidationFilter>();
         }
     }
 }

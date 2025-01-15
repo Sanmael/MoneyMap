@@ -1,11 +1,9 @@
-﻿using Domain.Base.Entities;
-
-namespace Domain.Cards.Entities
+﻿namespace Domain.Entities
 {
     public class Card : BaseEntitie
     {
         public Guid UserId { get; set; }
-        public Guid CategorieId { get; set; } 
+        public Guid CategorieId { get; set; }
         public virtual User? User { get; set; }
         public virtual PurchaseCategorie? Categorie { get; set; }
         public DateTime DueDate { get; set; }

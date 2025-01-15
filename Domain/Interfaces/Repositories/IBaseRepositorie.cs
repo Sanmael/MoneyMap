@@ -1,6 +1,6 @@
-﻿using Domain.Base.Entities;
+﻿using Domain.Entities;
 
-namespace Domain.Base.Interfaces.Repositories
+namespace Domain.Interfaces.Repositories
 {
     public interface IBaseRepositorie<T> where T : BaseEntitie
     {

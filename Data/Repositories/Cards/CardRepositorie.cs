@@ -1,6 +1,6 @@
 ﻿using Data.Context;
-using Domain.Base.Interfaces.Repositories;
-using Domain.Cards.Entities;
+using Domain.Entities;
+using Domain.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace Data.Repositories.Cards

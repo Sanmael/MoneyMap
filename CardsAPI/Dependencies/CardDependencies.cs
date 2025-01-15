@@ -5,10 +5,10 @@ using Data.Repositories;
 using FluentValidation;
 using Business.Handlers;
 using Data.Context;
-using Domain.Cards.Entities;
-using Domain.Base.Interfaces.Repositories;
 using Data.Cache;
 using Data.Cache.Repositories;
+using Domain.Interfaces.Repositories;
+using Domain.Entities;
 
 namespace CardsAPI.Dependencies
 {

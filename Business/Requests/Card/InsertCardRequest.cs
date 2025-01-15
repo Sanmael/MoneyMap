@@ -2,6 +2,7 @@
 {
     public class InsertCardRequest : BaseRequest
     {
+        public Guid UserId { get; set; }
         public DateTime DueDate { get; set; }
         public string Name { get; set; }
         public string? Description { get; set; }

@@ -1,5 +1,5 @@
-﻿using Domain.Base.Interfaces.Repositories;
-using Domain.Cards.Entities;
+﻿using Domain.Entities;
+using Domain.Interfaces.Repositories;
 
 namespace Data.Cache.Repositories
 {

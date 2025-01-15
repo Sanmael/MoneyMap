@@ -1,21 +1,28 @@
 ﻿using Integrations.DTO;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 
 namespace Integrations.Client
 {
-    public class AppClient(IHttpClientFactory httpClientFactory)
+    public class AppClient
     {
-        private readonly HttpClient _httpClient = httpClientFactory.CreateClient();
+        private static HttpClient _httpClient;
+
+        public AppClient(IHttpClientFactory httpClientFactory)
+        {
+            if (_httpClient == null)
+                _httpClient = httpClientFactory!.CreateClient();
+        }
 
         public async Task<T?> SendRequestAsync<T>(ClientDTO<T> clientDTO)
-        {            
+        {
             string content = JsonSerializer.Serialize(clientDTO);
 
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage()
             {
                 Method = HttpMethod.Post,
-                Content = new StringContent(content)            ,
+                Content = new StringContent(content),
                 RequestUri = new Uri(clientDTO.Url)
             };
 
@@ -31,7 +38,15 @@ namespace Integrations.Client
         {
             Uri uri = new Uri(clientDTO.Url);
 
-            HttpResponseMessage httpResponseMessage = await _httpClient.GetAsync(uri);
+            HttpRequestMessage httpRequestMessage = new HttpRequestMessage()
+            {
+                Method = HttpMethod.Get,
+                RequestUri = uri
+            };
+
+            httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", clientDTO.Token);
+
+            HttpResponseMessage httpResponseMessage = await _httpClient.SendAsync(httpRequestMessage);
 
             if (!httpResponseMessage.IsSuccessStatusCode)
                 return default;

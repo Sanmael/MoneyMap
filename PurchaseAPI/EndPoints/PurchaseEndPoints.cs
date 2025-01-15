@@ -1,6 +1,5 @@
 ﻿using Business.Handlers.Filters;
 using Business.Interfaces;
-using Business.Requests;
 using Business.Requests.Purchase;
 using Business.Response;
 
@@ -21,6 +20,7 @@ namespace PurchaseAPI.EndPoints
 
                 return Results.Created(response.Location, response);
             }).
+            RequireAuthorization().
             AddEndpointFilter<LoggerFilter>().
             AddEndpointFilter<ValidationFilter>();
 
@@ -33,10 +33,11 @@ namespace PurchaseAPI.EndPoints
 
                 return Results.Ok(response);
             }).
-             AddEndpointFilter<LoggerFilter>().
-             AddEndpointFilter<ValidationFilter>();
+            RequireAuthorization().
+            AddEndpointFilter<LoggerFilter>().
+            AddEndpointFilter<ValidationFilter>();
 
-            app.MapGet("/GetPurchasesActive", async ([AsParameters] BaseRequest request, IPurchaseService service) =>
+            app.MapGet("/GetPurchasesActive", async ([AsParameters] GetPurchaseListActiveRequest request, IPurchaseService service) =>
             {
                 BaseResponse response = await service.GetPurchaseListActive(request);
 
@@ -45,6 +46,7 @@ namespace PurchaseAPI.EndPoints
 
                 return Results.Ok(response);
             }).
+            RequireAuthorization().
             AddEndpointFilter<LoggerFilter>().
             AddEndpointFilter<ValidationFilter>();
         }

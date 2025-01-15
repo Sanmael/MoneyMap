@@ -2,16 +2,11 @@
 
 namespace Business.Requests
 {
-    public class BaseRequest
+    public abstract class BaseRequest
     {
-        public Guid UserId { get; set; }       
-    }
-
-    public static class BaseRequestExtensions
-    {
-        public static string GetSerializedRequest(this BaseRequest request)
+        public string GetSerializedRequest()
         {
-            return JsonSerializer.Serialize<object>(request);
+            return JsonSerializer.Serialize<object>(this.MemberwiseClone());
         }
     }
 }

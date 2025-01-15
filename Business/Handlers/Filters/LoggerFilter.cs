@@ -8,8 +8,8 @@ namespace Business.Handlers.Filters
     public class LoggerFilter(ILogger<BaseRequest> logger) : IEndpointFilter
     {
         public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
-        {
-            if (context.Arguments.FirstOrDefault(argument => argument?.GetType() == typeof(BaseRequest)) is not BaseRequest request)
+        {           
+            if (context.Arguments.FirstOrDefault(x => typeof(BaseRequest).IsAssignableFrom(x.GetType())) is not BaseRequest request)
                 return await next(context);
 
             var endpointName = context.HttpContext.GetEndpoint()?.DisplayName ?? request.GetType().Name;

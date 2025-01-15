@@ -2,11 +2,13 @@
 using Business.Interfaces;
 using Business.Requests.Card;
 using Business.Response;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CardsAPI.EndPoints
 {
     public static class CardEndPoints
     {
+        [Authorize]
         public static void MapCardEndPoints(this WebApplication app)
         {
             app.MapPost("/GenerateCard", async (InsertCardRequest request, ICardService cardService) =>
@@ -20,6 +22,7 @@ namespace CardsAPI.EndPoints
 
                 return Results.Created(response.Location, response);
             }).
+            RequireAuthorization().
             AddEndpointFilter<LoggerFilter>().
             AddEndpointFilter<ValidationFilter>();
 
@@ -32,6 +35,7 @@ namespace CardsAPI.EndPoints
 
                 return Results.Ok(response);
             }).
+            RequireAuthorization().
             AddEndpointFilter<LoggerFilter>().
             AddEndpointFilter<ValidationFilter>();
         }

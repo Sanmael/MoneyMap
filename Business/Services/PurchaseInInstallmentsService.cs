@@ -5,8 +5,8 @@ using Business.Requests;
 using Business.Requests.Card;
 using Business.Requests.Card.PurchaseInInstallments;
 using Business.Response;
-using Domain.Base.Interfaces.Repositories;
-using Domain.Cards.Entities;
+using Domain.Entities;
+using Domain.Interfaces.Repositories;
 
 namespace Business.Services
 {
@@ -121,7 +121,7 @@ namespace Business.Services
             await installmentsRepositorie.InsertPurchaseInInstallmentsAsync(installments);
         }
 
-        public async Task<BaseResponse> GetAllPurchaseInInstallmentsListActive(BaseRequest baseRequest)
+        public async Task<BaseResponse> GetAllPurchaseInInstallmentsListActive(GetAllPurchaseInInstallmentsListActiveRequest baseRequest)
         {
             List<PurchaseInInstallments>? installments = await purchaseInInstallmentsRepositorie.GetAllPurchaseInInstallmentsActiveAsync(baseRequest.UserId);
             List<PurchaseInInstallmentsModel>? purchaseInInstallmentsModels = installments.Select(entity => entity.MapperEntitieToModel()).ToList();

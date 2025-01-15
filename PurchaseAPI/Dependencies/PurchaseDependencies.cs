@@ -4,7 +4,7 @@ using Data.Repositories;
 using FluentValidation;
 using Business.Handlers;
 using Data.Repositories.Purchases;
-using Domain.Base.Interfaces.Repositories;
+using Domain.Interfaces.Repositories;
 
 namespace PurchaseAPI.Dependencies
 {

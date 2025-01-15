@@ -2,20 +2,22 @@
 {
     public record ClientDTO<T>
     (
+        T Entity,
         string Url,
-        T Entity
-    );    
+        string Token
+    );
 
     public record ClientDTO
     (
-        string Url
+        string Url,
+        string Token
     );
 
     public static class ClientExtensions
     {
-        public static ClientDTO<T> MapperDTO<T>(T entity, string Url)
+        public static ClientDTO<T> MapperDTO<T>(T entity, string url,string token)
         {
-            return new ClientDTO<T>(Url, entity);
+            return new ClientDTO<T>(entity,url,token);
         }
     }
 }

@@ -36,7 +36,7 @@ namespace Business.Response
 
     public class BaseResponse<T> : BaseResponse
     {
-        public T Data { get; set; }
+        public T? Data { get; set; }
 
         public BaseResponse() : base(true) { }
 
@@ -56,7 +56,7 @@ namespace Business.Response
         public static T GetData<T>(this BaseResponse baseResponse)
         {
             if (baseResponse is BaseResponse<T> responseConvert)
-                return responseConvert.Data;
+                return responseConvert.Data!;
 
             throw new InvalidCastException($"Cannot convert BaseResponse to BaseResponse<{typeof(T).Name}>.");
         }

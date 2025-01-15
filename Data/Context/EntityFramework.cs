@@ -1,11 +1,11 @@
-﻿using Domain.Base.Entities;
-using Domain.Cards.Entities;
+﻿using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Data.Context
 {
     public class EntityFramework : DbContext
     {
+
         public EntityFramework(DbContextOptions<EntityFramework> dbContextOptions) : base(dbContextOptions)
         {
             

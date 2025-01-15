@@ -2,6 +2,7 @@
 {
     public class InsertPurchaseRequest : BaseRequest
     {
+        public Guid UserId { get; set; }
         public decimal Value { get; set; }
         public required string Name { get; set; }
         public string? Description { get; set; }

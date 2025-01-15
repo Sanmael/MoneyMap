@@ -1,9 +1,7 @@
-﻿using Domain.Base.Entities;
-
-namespace Domain.Cards.Entities
+﻿namespace Domain.Entities
 {
     public class Installments : BaseEntitie
-    {                
+    {
         public virtual PurchaseInInstallments? PurchaseInInstallments { get; set; }
         public Guid PurchaseInInstallmentsId { get; set; }
         public decimal Value { get; set; }

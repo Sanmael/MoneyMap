@@ -5,6 +5,8 @@ using CardsAPI.Dependencies;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson;
+using Business.Extensions;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +20,7 @@ builder.Services.AddStackExchangeRedisCache(config =>
 {
     config.Configuration = builder.Configuration.GetConnectionString("Redis");
 });
+builder.AddJwtAuthorize();
 
 builder.Services.Configure<MongoDbConfig>(builder.Configuration.GetSection("MongoDbConfig"));
 builder.Services.AddSingleton<MongoDBContext>();
@@ -33,6 +36,6 @@ if (app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.MapCardEndPoints();
+app.MapCardEndPoints(); 
 app.MapPurchaseInInstallmentsEndPoints();
 app.Run();

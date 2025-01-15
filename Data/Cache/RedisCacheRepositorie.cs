@@ -49,11 +49,12 @@ namespace Data.Cache
             };
         }
 
-        public async Task RemoveCache(string id)
+        public async Task RemoveCache(string id, [CallerMemberName] string callerName = "")
         {
             try
             {
-                await distributedCache.RemoveAsync(id);
+                string key = callerName + id;
+                await distributedCache.RemoveAsync(key);
             }
             catch (Exception)
             {

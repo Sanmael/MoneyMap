@@ -2,9 +2,10 @@
 using Business.Models;
 using Business.Response;
 using Debts.API.Requests;
+using Domain.Interfaces.Repositories;
 using Integrations.Client;
 using Integrations.DTO;
-
+using System.Security.Claims;
 namespace Debts.API.EndPoints
 {
     public static class DebitsEndPoints
@@ -14,10 +15,12 @@ namespace Debts.API.EndPoints
             string cardApiUrl = configuration.GetValue<string>("CardAPIUrl")!;
             string purchaseAPIUrl = configuration.GetValue<string>("PurchaseAPIUrl")!;
 
-            app.MapGet("/GetDebits", async ([AsParameters] GetDebitsRequest getDebitsRequest, AppClient appClient) =>
+            app.MapGet("/GetDebits", async ([AsParameters] GetDebitsRequest getDebitsRequest, IAuthenticationRepositorie iAuthenticationRepositorie, AppClient appClient, ClaimsPrincipal claimsPrincipal) =>
             {
-                BaseResponse<List<PurchaseModel>>? purchasesResponse = await appClient.GetAsync<BaseResponse<List<PurchaseModel>>>(new ClientDTO(Url: $"{purchaseAPIUrl}/GetPurchasesActive?userId={getDebitsRequest.UserId}"));
-                BaseResponse<List<CardModel>>? cardsResponse = await appClient.GetAsync<BaseResponse<List<CardModel>>>(new ClientDTO(Url: $"{cardApiUrl}/GetAllPurchaseInInstallmentsListActive?userId={getDebitsRequest.UserId}"));
+                string token = await iAuthenticationRepositorie.GetAuthenticationToken(getDebitsRequest.UserId);
+
+                BaseResponse<List<PurchaseModel>>? purchasesResponse = await appClient.GetAsync<BaseResponse<List<PurchaseModel>>>(new ClientDTO(Url: $"{purchaseAPIUrl}/GetPurchasesActive?userId={getDebitsRequest.UserId}", Token: token));
+                BaseResponse<List<CardModel>>? cardsResponse = await appClient.GetAsync<BaseResponse<List<CardModel>>>(new ClientDTO(Url: $"{cardApiUrl}/GetAllPurchaseInInstallmentsListActive?userId={getDebitsRequest.UserId}", Token: token));
 
                 DebitsModel debitsModel = new DebitsModel
                 {
@@ -34,19 +37,23 @@ namespace Debts.API.EndPoints
                 return Results.Ok(debitsModel);
             }).
             AddEndpointFilter<LoggerFilter>().
-            AddEndpointFilter<ValidationFilter>();
+            AddEndpointFilter<ValidationFilter>().
+            AddEndpointFilter<TokenValidationMiddleware>().
+            RequireAuthorization();
 
 
-            app.MapGet("/GetDebitsByDate", async ([AsParameters] GetDebitsByDateRequest getDebitsByDateRequest, AppClient appClient) =>
+            app.MapGet("/GetDebitsByDate", async ([AsParameters] GetDebitsByDateRequest getDebitsByDateRequest, IAuthenticationRepositorie iAuthenticationRepositorie, AppClient appClient) =>
             {
+                string token = await iAuthenticationRepositorie.GetAuthenticationToken(getDebitsByDateRequest.UserId);
+
                 string parameters = GetParameters(getDebitsByDateRequest.UserId, getDebitsByDateRequest.StartMonth, getDebitsByDateRequest.EndMonth);
 
-                BaseResponse<List<CardModel>>? cardsResponse = await appClient.GetAsync<BaseResponse<List<CardModel>>>(new ClientDTO(Url: $"{cardApiUrl}/{parameters}"));
+                BaseResponse<List<CardModel>>? cardsResponse = await appClient.GetAsync<BaseResponse<List<CardModel>>>(new ClientDTO(Url: $"{cardApiUrl}/{parameters}", Token: token));
 
                 BaseResponse<List<PurchaseModel>>? purchasesResponse = default;
 
                 if (getDebitsByDateRequest.StartMonth?.Month == DateTime.Now.Month || getDebitsByDateRequest.StartMonth == null)
-                    purchasesResponse = await appClient.GetAsync<BaseResponse<List<PurchaseModel>>>(new ClientDTO(Url: $"{purchaseAPIUrl}/GetPurchasesActive?userId={getDebitsByDateRequest.UserId}"));
+                    purchasesResponse = await appClient.GetAsync<BaseResponse<List<PurchaseModel>>>(new ClientDTO(Url: $"{purchaseAPIUrl}/GetPurchasesActive?userId={getDebitsByDateRequest.UserId}", Token: token));
 
                 DebitsModel debitsModel = new DebitsModel
                 {
@@ -62,7 +69,9 @@ namespace Debts.API.EndPoints
                 return Results.Ok(debitsModel);
             }).
             AddEndpointFilter<LoggerFilter>().
-            AddEndpointFilter<ValidationFilter>();
+            AddEndpointFilter<ValidationFilter>().
+            RequireAuthorization();
+
         }
 
         private static string GetParameters(Guid userId, DateTime? startMonth, DateTime? endMonth)

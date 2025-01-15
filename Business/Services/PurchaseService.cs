@@ -4,8 +4,8 @@ using Business.Models;
 using Business.Requests;
 using Business.Requests.Purchase;
 using Business.Response;
-using Domain.Base.Entities;
-using Domain.Base.Interfaces.Repositories;
+using Domain.Entities;
+using Domain.Interfaces.Repositories;
 
 namespace Business.Services
 {
@@ -32,7 +32,7 @@ namespace Business.Services
             return new BaseResponse<PurchaseModel>(purchaseModel);
         }
 
-        public async Task<BaseResponse> GetPurchaseListActive(BaseRequest baseRequest)
+        public async Task<BaseResponse> GetPurchaseListActive(GetPurchaseListActiveRequest baseRequest)
         {
             List<Purchase>? purchases = await purchaseRepositorie.GetPurchaseActiveAsync(baseRequest.UserId);
 

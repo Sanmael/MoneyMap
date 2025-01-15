@@ -1,6 +1,6 @@
 ﻿using Data.Context;
-using Domain.Base.Entities;
-using Domain.Base.Interfaces.Repositories;
+using Domain.Entities;
+using Domain.Interfaces.Repositories;
 
 namespace Data.Repositories
 {

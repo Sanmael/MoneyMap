@@ -2,6 +2,7 @@
 {
     public class InsertPurchaseInInstallmentsRequest : BaseRequest
     {
+        public Guid UserId { get; set; }
         public Guid CardId { get; set; }        
         public int NumberOfInstallments { get; set; }
         public decimal InstallmentValue { get; set; }

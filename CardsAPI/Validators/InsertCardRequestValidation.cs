@@ -1,6 +1,5 @@
 ﻿using Business.Requests.Card;
 using Business.Validations.Messages;
-using Domain.Base.Entities;
 using FluentValidation;
 
 namespace CardsAPI.Validators

@@ -1,11 +1,13 @@
-﻿using FluentValidation;
+﻿using Business.Requests;
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 
 public class ValidationFilter(IServiceProvider serviceProvider) : IEndpointFilter
 {
     public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
     {
-        var request = context.Arguments.FirstOrDefault();
+        var request = context.Arguments.FirstOrDefault(x => typeof(BaseRequest).IsAssignableFrom(x.GetType()));
+
         if (request == null)
             return await next(context);
 

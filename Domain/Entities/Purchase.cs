@@ -1,5 +1,4 @@
-﻿
-namespace Domain.Base.Entities
+﻿namespace Domain.Entities
 {
     public class Purchase : BaseEntitie
     {
@@ -11,6 +10,6 @@ namespace Domain.Base.Entities
         public decimal TotalPrice { get; set; }
         public Guid? CategorieId { get; set; }
         public bool Paid { get; set; } = true;
-        public virtual PurchaseCategorie? Categorie { get; set; } 
+        public virtual PurchaseCategorie? Categorie { get; set; }
     }
 }

@@ -1,6 +1,4 @@
-﻿using Domain.Base.Entities;
-
-namespace Domain.Cards.Entities
+﻿namespace Domain.Entities
 {
     public class PurchaseInInstallments : Purchase
     {

@@ -3,8 +3,8 @@ using Business.Interfaces;
 using Business.Models;
 using Business.Requests.Card;
 using Business.Response;
-using Domain.Base.Interfaces.Repositories;
-using Domain.Cards.Entities;
+using Domain.Entities;
+using Domain.Interfaces.Repositories;
 
 namespace Business.Services
 {

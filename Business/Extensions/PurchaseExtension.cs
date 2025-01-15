@@ -1,6 +1,6 @@
 ﻿using Business.Models;
 using Business.Requests.Purchase;
-using Domain.Base.Entities;
+using Domain.Entities;
 
 namespace Business.Extensions
 {
