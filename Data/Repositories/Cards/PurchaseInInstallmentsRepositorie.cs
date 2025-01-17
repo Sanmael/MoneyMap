@@ -25,12 +25,13 @@ namespace Data.Repositories.Cards
             await baseRepositorie.Update(baseEntitie);
         }
 
-        public async Task<PurchaseInInstallments?> GetPurchaseInInstallmentsAsync(Guid purchaseInInstallmentsId)
+        public async Task<PurchaseInInstallments?> GetPurchaseInInstallmentsAsync(Guid purchaseInInstallmentsId, Guid userId)
         {
             var query = new[]
             {
                 new BsonDocument("$match", new BsonDocument
                 {
+                    { "UserId", new BsonBinaryData(userId, GuidRepresentation.Standard) },
                     { "_id", new BsonBinaryData(purchaseInInstallmentsId, GuidRepresentation.Standard) },
                 }),
                 new BsonDocument("$lookup", new BsonDocument
@@ -45,7 +46,7 @@ namespace Data.Repositories.Cards
             var result = await mongoDBContext.GetCollection<PurchaseInInstallments>()
                    .AggregateAsync<PurchaseInInstallments>(query);
 
-            return await result.FirstAsync();
+            return await result.FirstOrDefaultAsync();
         }
 
         public async Task<List<PurchaseInInstallments>>? GetPurchaseInInstallmentsActiveByCardIdAsync(Guid cardId)
@@ -97,15 +98,15 @@ namespace Data.Repositories.Cards
             return await result.ToListAsync();
         }
 
-        public async Task<List<PurchaseInInstallments>> GetAllPurchaseInInstallmentsByDateAsync(Guid userId,DateTime? firstDate, DateTime? lastDate)
+        public async Task<List<PurchaseInInstallments>> GetAllPurchaseInInstallmentsByDateAsync(Guid userId, DateTime? firstDate, DateTime? lastDate)
         {
             if (firstDate == null && lastDate == null)
                 throw new ArgumentException("Deve haver ao menos um filtro preenchido.");
 
             var filters = new List<BsonDocument>
             {
-                new BsonDocument("$match", new BsonDocument 
-                { 
+                new BsonDocument("$match", new BsonDocument
+                {
                     { "Paid", false },
                     { "UserId", new BsonBinaryData(userId, GuidRepresentation.Standard) },
                 })

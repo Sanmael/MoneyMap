@@ -1,7 +1,8 @@
-﻿using Business.Handlers.Filters;
+﻿using Business.DTOS;
 using Business.Interfaces;
 using Business.Requests.Purchase;
 using Business.Response;
+using Business.Security;
 
 namespace PurchaseAPI.EndPoints
 {
@@ -9,8 +10,11 @@ namespace PurchaseAPI.EndPoints
     {
         public static void MapPurchaseEndPoints(this WebApplication app)
         {
-            app.MapPost("/AddPurchase", async (InsertPurchaseRequest request, IPurchaseService service) =>
+            app.MapPost("/AddPurchase", async (InsertPurchaseRequest request, IPurchaseService service, HttpContext context) =>
             {
+                ClaimsDTO claimsDTO = TokenService.GetUserData(context);
+                request.UserId = claimsDTO.UserId;
+
                 BaseResponse response = await service.AddPurchaseAsync(request);
 
                 if (!response.Success)
@@ -24,8 +28,16 @@ namespace PurchaseAPI.EndPoints
             AddEndpointFilter<LoggerFilter>().
             AddEndpointFilter<ValidationFilter>();
 
-            app.MapGet("/GetPurchase", async ([AsParameters] GetPurchaseRequest request, IPurchaseService service) =>
-            {
+            app.MapGet("/GetPurchase", async (Guid purchaseId, IPurchaseService service, HttpContext context) =>
+            {                
+                ClaimsDTO claimsDTO = TokenService.GetUserData(context);
+
+                GetPurchaseRequest request = new GetPurchaseRequest()
+                {
+                    UserId = claimsDTO.UserId,
+                    PurchaseId = purchaseId
+                };
+                
                 BaseResponse response = await service.GetPurchase(request);
 
                 if (!response.Success)
@@ -37,8 +49,12 @@ namespace PurchaseAPI.EndPoints
             AddEndpointFilter<LoggerFilter>().
             AddEndpointFilter<ValidationFilter>();
 
-            app.MapGet("/GetPurchasesActive", async ([AsParameters] GetPurchaseListActiveRequest request, IPurchaseService service) =>
+            app.MapGet("/GetPurchasesActive", async (IPurchaseService service, HttpContext context) =>
             {
+                ClaimsDTO claimsDTO = TokenService.GetUserData(context);
+
+                GetPurchaseListActiveRequest request = new GetPurchaseListActiveRequest() { UserId = claimsDTO.UserId };
+
                 BaseResponse response = await service.GetPurchaseListActive(request);
 
                 if (!response.Success)

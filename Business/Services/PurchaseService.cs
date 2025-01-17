@@ -22,7 +22,7 @@ namespace Business.Services
 
         public async Task<BaseResponse> GetPurchase(GetPurchaseRequest getPurchaseRequest)
         {
-            Purchase? purchase = await purchaseRepositorie.GetPurchaseAsync(getPurchaseRequest.PurchaseId);
+            Purchase? purchase = await purchaseRepositorie.GetPurchaseAsync(getPurchaseRequest.UserId,getPurchaseRequest.PurchaseId);
 
             if (purchase == null)
                 return new BaseResponse("Compra inexistente");

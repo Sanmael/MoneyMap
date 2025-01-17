@@ -25,14 +25,14 @@ namespace Data.Cache.Repositories
             return purchaseRepositorie.GetPurchaseActiveByDate(userId, firstDate, lastDate);
         }
 
-        public async Task<Purchase?> GetPurchaseAsync(Guid purchaseId)
+        public async Task<Purchase?> GetPurchaseAsync(Guid userId,Guid purchaseId)
         {
             Purchase? purchase = await redisCacheRepositorie.GetCache<Purchase>(purchaseId.ToString());
 
             if (purchase != null)
                 return purchase;
 
-            purchase = await purchaseRepositorie.GetPurchaseAsync(purchaseId);
+            purchase = await purchaseRepositorie.GetPurchaseAsync(userId,purchaseId);
 
             if (purchase != null)
                 await redisCacheRepositorie.SaveCache(purchase, purchaseId.ToString());

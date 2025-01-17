@@ -1,33 +1,37 @@
-﻿using Business.Requests;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 
-namespace Business.Handlers.Filters
+//ajustar depois, não salvar logs da api de auth e salvar metodos de get
+public class LoggerFilter(ILogger<LoggerFilter> logger) : IEndpointFilter
 {
-    public class LoggerFilter(ILogger<BaseRequest> logger) : IEndpointFilter
+    public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
     {
-        public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
-        {           
-            if (context.Arguments.FirstOrDefault(x => typeof(BaseRequest).IsAssignableFrom(x.GetType())) is not BaseRequest request)
-                return await next(context);
+        var httpContext = context.HttpContext;
+        var request = httpContext.Request;
+        var endpointName = httpContext.GetEndpoint()?.DisplayName ?? "UnknownEndpoint";
+        var body = httpContext.Items["RequestBody"] as string;
 
-            var endpointName = context.HttpContext.GetEndpoint()?.DisplayName ?? request.GetType().Name;
+        var requestData = new
+        {
+            Method = request.Method,
+            Path = request.Path,
+            Query = request.Query.Any() ? request.Query.ToDictionary(q => q.Key, q => q.Value.ToString()) : null,
+            Body = body
+        };
 
-            logger.LogInformation("{@Handler}.Handle called with {@Query}", endpointName, request.GetSerializedRequest());
+        logger.LogInformation("Handling request to {Endpoint} with data: {@RequestData}", endpointName, requestData);
 
-            Stopwatch stopwatch = Stopwatch.StartNew();
+        Stopwatch stopwatch = Stopwatch.StartNew();
 
-            try
-            {
-                return await next(context);
-            }
-
-            finally
-            {
-                stopwatch.Stop();
-                logger.LogInformation("[Performance] the request {Request} took {TimeTaken}", endpointName, stopwatch.Elapsed.TotalSeconds);
-            }
+        try
+        {
+            return await next(context);
+        }
+        finally
+        {
+            stopwatch.Stop();
+            logger.LogInformation("[Performance] Request to {Endpoint} took {TimeTaken} seconds", endpointName, stopwatch.Elapsed.TotalSeconds);
         }
     }
 }

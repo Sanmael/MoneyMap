@@ -26,14 +26,14 @@ namespace Data.Cache.Repositories
             await redisCacheRepositorie.SaveCache(baseEntitie, baseEntitie.Id.ToString());
         }
 
-        public async Task<PurchaseInInstallments?> GetPurchaseInInstallmentsAsync(Guid purchaseInInstallmentsId)
+        public async Task<PurchaseInInstallments?> GetPurchaseInInstallmentsAsync(Guid purchaseInInstallmentsId, Guid userId)
         {
             PurchaseInInstallments? cached = await redisCacheRepositorie.GetCache<PurchaseInInstallments>(purchaseInInstallmentsId.ToString());
 
             if (cached != null)
                 return cached;
 
-            PurchaseInInstallments? purchaseInInstallments = await purchaseInInstallmentsRepositorie.GetPurchaseInInstallmentsAsync(purchaseInInstallmentsId);
+            PurchaseInInstallments? purchaseInInstallments = await purchaseInInstallmentsRepositorie.GetPurchaseInInstallmentsAsync(purchaseInInstallmentsId, userId);
 
             if (purchaseInInstallments != null)
                 await redisCacheRepositorie.SaveCache(purchaseInInstallments, purchaseInInstallments.Id.ToString());
@@ -45,7 +45,7 @@ namespace Data.Cache.Repositories
         {
             List<PurchaseInInstallments>? cached = await redisCacheRepositorie.GetCache<List<PurchaseInInstallments>>(cardId.ToString());
 
-            if (cached != null)
+            if (cached != null && cached.Count > 0)
                 return cached;
 
             List<PurchaseInInstallments>? purchaseInInstallments = await purchaseInInstallmentsRepositorie.GetPurchaseInInstallmentsActiveByCardIdAsync(cardId);
@@ -74,7 +74,7 @@ namespace Data.Cache.Repositories
         private async Task RemoveAllCachesAsync(PurchaseInInstallments purchaseInInstallments)
         {
             await redisCacheRepositorie.RemoveCache(nameof(GetPurchaseInInstallmentsAsync) + purchaseInInstallments.Id);
-            await redisCacheRepositorie.RemoveCache(nameof(GetPurchaseInInstallmentsActiveByCardIdAsync) + purchaseInInstallments.Card.Id);
+            await redisCacheRepositorie.RemoveCache(nameof(GetPurchaseInInstallmentsActiveByCardIdAsync) + purchaseInInstallments.CardId);
             await redisCacheRepositorie.RemoveCache(nameof(GetAllPurchaseInInstallmentsActiveAsync) + purchaseInInstallments.UserId);
         }
 

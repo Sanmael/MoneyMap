@@ -64,10 +64,11 @@ namespace Business.Extensions
         public static PurchaseInInstallments MapperInsertRequestToEntitie(this InsertPurchaseInInstallmentsRequest purchaseInInstallments)
         {
             return new PurchaseInInstallments
-            {
-                DateOfPurchase = purchaseInInstallments.DateOfPurchase,
-                TotalPrice = purchaseInInstallments.GetTotalValue(),
+            {                
+                Paid = false,
                 UserId = purchaseInInstallments.UserId,
+                DateOfPurchase = purchaseInInstallments.DateOfPurchase,
+                TotalPrice = purchaseInInstallments.GetTotalValue(),                
                 CardId = purchaseInInstallments.CardId,
                 Name = purchaseInInstallments.Name,
                 Description = purchaseInInstallments.Description,

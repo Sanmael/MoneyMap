@@ -25,6 +25,7 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 
+//app.UseMiddleware<RequestLoggingMiddleware>();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

@@ -1,6 +1,6 @@
-﻿using Business.Handlers.Filters;
-using Business.Interfaces;
+﻿using Business.Interfaces;
 using Business.Response;
+using Business.Security;
 using System.Security.Claims;
 
 namespace UserAPI.EndPoints
@@ -18,11 +18,13 @@ namespace UserAPI.EndPoints
 
                 return Results.BadRequest(result.Message);
             }).
-            AddEndpointFilter<LoggerFilter>().
             AddEndpointFilter<ValidationFilter>();
 
-            app.MapGet("/GetUser", (ClaimsPrincipal claimsPrincipal) =>
+            app.MapGet("/GetUser", (HttpContext context) =>
             {
+                string token = TokenService.GetAccessToken(context);
+                ClaimsPrincipal claimsPrincipal = TokenService.ReadJsonJWT(token);
+
                 var objeto = new
                 {
                     Nome = claimsPrincipal.Identity!.Name,

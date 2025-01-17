@@ -18,11 +18,11 @@ namespace Data.Repositories.Purchases
             await baseRepositorie.Update(baseEntitie);
         }
 
-        public async Task<Purchase?> GetPurchaseAsync(Guid purchaseId)
+        public async Task<Purchase?> GetPurchaseAsync(Guid userId,Guid purchaseId)
         {
             IMongoCollection<Purchase> mongoCollection = mongoDBContext.GetCollection<Purchase>();
 
-            var document = await mongoCollection.FindAsync(x => x.Id == purchaseId);
+            var document = await mongoCollection.FindAsync(x=> x.UserId == userId && x.Id == purchaseId);
 
             return document.First();
         }

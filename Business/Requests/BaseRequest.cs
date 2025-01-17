@@ -6,7 +6,7 @@ namespace Business.Requests
     {
         public string GetSerializedRequest()
         {
-            return JsonSerializer.Serialize<object>(this.MemberwiseClone());
+            return JsonSerializer.Serialize(MemberwiseClone());
         }
     }
 }

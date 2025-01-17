@@ -1,5 +1,4 @@
-﻿using Business.Handlers.Filters;
-using Business.Interfaces;
+﻿using Business.Interfaces;
 using Business.Requests.User;
 using Business.Response;
 
@@ -18,7 +17,6 @@ namespace UserAPI.EndPoints
 
                 return Results.BadRequest(result.Message);
             }).
-             AddEndpointFilter<LoggerFilter>().
              AddEndpointFilter<ValidationFilter>();            
         }
     }

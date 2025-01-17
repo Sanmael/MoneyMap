@@ -1,7 +1,10 @@
-﻿namespace Business.Requests.Card.PurchaseInInstallments
+﻿using System.Text.Json.Serialization;
+
+namespace Business.Requests.Card.PurchaseInInstallments
 {
     public class InsertPurchaseInInstallmentsRequest : BaseRequest
     {
+        [JsonIgnore]
         public Guid UserId { get; set; }
         public Guid CardId { get; set; }        
         public int NumberOfInstallments { get; set; }

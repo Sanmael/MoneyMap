@@ -1,7 +1,10 @@
-﻿namespace Business.Requests.Purchase
+﻿using System.Text.Json.Serialization;
+
+namespace Business.Requests.Purchase
 {
     public class InsertPurchaseRequest : BaseRequest
     {
+        [JsonIgnore]
         public Guid UserId { get; set; }
         public decimal Value { get; set; }
         public required string Name { get; set; }

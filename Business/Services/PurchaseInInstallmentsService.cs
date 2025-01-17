@@ -60,7 +60,7 @@ namespace Business.Services
 
         public async Task<BaseResponse> GetPurchaseInInstallments(GetPurchaseInInstallmentsRequest getPurchaseInInstallmentsRequest)
         {
-            PurchaseInInstallments? purchaseInInstallments = await purchaseInInstallmentsRepositorie.GetPurchaseInInstallmentsAsync(getPurchaseInInstallmentsRequest.PurchaseInInstallmentsId);
+            PurchaseInInstallments? purchaseInInstallments = await purchaseInInstallmentsRepositorie.GetPurchaseInInstallmentsAsync(getPurchaseInInstallmentsRequest.PurchaseInInstallmentsId, getPurchaseInInstallmentsRequest.UserId);
 
             if (purchaseInInstallments == null)
                 return new BaseResponse("Pagamento não encontrado");
